@@ -1,0 +1,2 @@
+2022-03-15 15:30:26.575 [INFO ] [openhab.event.ItemStateChangedEvent ] - Item 'evcr-charger-1-mode' changed from OFF to FAST
+2022-03-15 15:30:26.575 [INFO ] [openhab.event.ItemStateChangedEvent ] - Item 'evcr-charger-1-mode' changed from OFF to RULES

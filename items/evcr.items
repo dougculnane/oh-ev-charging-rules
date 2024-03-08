@@ -1,0 +1,23 @@
+// openHAB items file.
+// itemtype itemname "labeltext [stateformat]" <iconname> (group1, group2, ...) ["tag1", "tag2", ...] {bindingconfig}
+
+Group	gEVCR
+
+Number  evcr_export_power "Exported Power [%d W]" 						<energy>	(gEVCR)
+Number  evcr_grid_power_price "Price of grid power € [%.2f] / MWh"		<price>		(gEVCR)
+Number  evcr_cheap_power_price "Price of cheap power € [%.2f] / MWh"	<price>		(gEVCR)
+
+// Charger 1
+String 	evcr_charger_1_name		"Charger [%s]"			(gEVCR)
+String 	evcr_charger_1_mode 	"Charging Mode [%s]"	(gEVCR) {stateDescription="[options=OFF, FAST, RULES]"}
+Switch  evcr_charger_1_switch
+Number	evcr_charger_1_amps_min "Amps min. [%s]"		(gEVCR)
+Number	evcr_charger_1_amps_max "Amps max. [%s]"		(gEVCR)
+Number	evcr_charger_1_phases 	"Phases [%s]"			(gEVCR)
+Number	evcr_charger_1_power 	"Charge Power [%d W]"	 <energy>	(gEVCR)
+
+DateTime	evcr_charger_1_timer_start 	"Charge start [%1$tH:%1$tM]"	(gEVCR)
+DateTime	evcr_charger_1_timer_finish	"Charge finish [%1$tH:%1$tM]"	(gEVCR)
+
+// Car 1
+String 	evcr_car_1_name	"Car [%s]"			(gEVCR)
