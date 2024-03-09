@@ -13,8 +13,8 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 
 public class EVChargingRules extends JRule {
  
-	static final Duration TIME_LOCK_FOR_CHARGER = Duration.ofSeconds(30);
-	static final Duration CHARGER_POLLING_DURATION = Duration.ofSeconds(60);
+	static final Duration TIME_LOCK_FOR_CHARGER = Duration.ofSeconds(5);   // 30 for real
+	static final Duration CHARGER_POLLING_DURATION = Duration.ofSeconds(10); // 60 for real.
 	static final String CHARGER_POLLING_RULE_NAME = "evcr_charger_polling";
 	static final String RULE_NAME_EXPORT_POWER = "evcr_export_power";
 	
@@ -38,7 +38,7 @@ public class EVChargingRules extends JRule {
 	
 	@JRuleName(CHARGER_POLLING_RULE_NAME)
 	@JRuleWhenItemChange(item = "evcr_charger_polling_switch")
-	protected void pollChargers(JRuleItemEvent event) {
+	public void pollChargers(JRuleItemEvent event) {
 		logInfo(CHARGER_POLLING_RULE_NAME + " from: {} to: {}", event.getOldState(), event.getState());
 		if (event.getState() == JRuleOnOffValue.ON) {
 			if (isTimerRunning(CHARGER_POLLING_RULE_NAME)) {
