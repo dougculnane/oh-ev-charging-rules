@@ -11,12 +11,12 @@ import org.openhab.automation.jrule.items.metadata.JRuleItemMetadata;
 import org.openhab.automation.jrule.rules.value.JRuleValue;
 import org.openhab.core.types.State;
 
-public class TestItem implements JRuleItem {
+public class MockJRuleItem implements JRuleItem {
 
 	String name;
 	JRuleValue value;
 	
-	public TestItem(String name) {
+	public MockJRuleItem(String name) {
 		this.name = name;
 	}
 

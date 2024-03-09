@@ -3,25 +3,34 @@ package org.openhab.automation.jrule.rules.user.items;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
-import org.openhab.automation.jrule.items.JRuleSwitchItem;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+import org.openhab.automation.jrule.items.JRuleNumberItem;
+import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
 
-public class TestSwitchItem extends TestItem implements JRuleSwitchItem {
+public class MockJRuleNumberItem extends MockJRuleItem implements JRuleNumberItem {
 
-	
-	public TestSwitchItem(String name) {
+	public MockJRuleNumberItem(String name) {
 		super(name);
-		this.value = JRuleOnOffValue.ON;
+		this.value = new JRuleDecimalValue("0");
 	}
-
+	
 	@Override
-    public JRuleOnOffValue getStateAsOnOff() {
-        return (JRuleOnOffValue) value;
+	public JRuleDecimalValue getStateAsDecimal() {
+        return (JRuleDecimalValue) value;
     }
 	
 	@Override
-	public void sendCommand(JRuleOnOffValue command) {
+	public void sendCommand(JRuleDecimalValue command) {
 		this.value = command;
+    }
+	
+	@Override
+	public void sendCommand(double command) {
+		sendCommand(new JRuleDecimalValue(command));
+    }
+	
+	@Override
+	public void sendCommand(int command) {
+		sendCommand(new JRuleDecimalValue(command));
     }
 	
 	@Override
@@ -59,5 +68,6 @@ public class TestSwitchItem extends TestItem implements JRuleSwitchItem {
 		// TODO Auto-generated method stub
 		return Optional.empty();
 	}
+
 
 }

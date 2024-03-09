@@ -8,10 +8,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.openhab.automation.jrule.items.JRuleNumberItem;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
-import org.openhab.automation.jrule.rules.user.Charger;
-import org.openhab.automation.jrule.rules.user.OpenHabEnvironment;
-import org.openhab.automation.jrule.rules.user.items.TestJRuleNumberItem;
-import org.openhab.automation.jrule.rules.user.items.TestSwitchItem;
+import org.openhab.automation.jrule.rules.user.items.MockJRuleNumberItem;
+import org.openhab.automation.jrule.rules.user.items.MockSwitchItem;
 import org.openhab.automation.jrule.rules.user.Charger.MODE_VALUE;
 import org.openhab.automation.jrule.rules.user.Charger.RULE_NAME;
 
@@ -176,22 +174,14 @@ class TestCharger {
 		assertFast(charger1, 1);
 	}
 	
-	private void sendPVData(Charger charger, double gridPower, boolean isOn, int phases, int  amps) {
-		charger.getGridPowerItem().sendCommand(gridPower);
-		charger.handlePolling();
-		assertEquals(isOn, charger.isOn());
-		assertEquals(phases, charger.getPhases());
-		assertEquals(amps, charger.getAmps());
-	}
-
 	private Charger getTestCharger(int number) {
-		final JRuleNumberItem gridPower = new TestJRuleNumberItem("evcr_export_power");
-		final JRuleNumberItem gridPowerPrice = new TestJRuleNumberItem("evcr_grid_power_price");
-		final JRuleNumberItem cheapPowerPrice = new TestJRuleNumberItem("evcr_cheap_power_price");
-		final JRuleSwitchItem mainSwitch = new TestSwitchItem("evcr_charger_" + number + "_switch");
-		final JRuleNumberItem amps = new TestJRuleNumberItem("evcr_charger_" + number + "_amps");
-		final JRuleNumberItem phases = new TestJRuleNumberItem("evcr_charger_" + number + "_phases");
-		final JRuleNumberItem chargePower = new TestJRuleNumberItem("evcr_charger_" + number + "_power");
+		final JRuleNumberItem gridPower = new MockJRuleNumberItem("evcr_export_power");
+		final JRuleNumberItem gridPowerPrice = new MockJRuleNumberItem("evcr_grid_power_price");
+		final JRuleNumberItem cheapPowerPrice = new MockJRuleNumberItem("evcr_cheap_power_price");
+		final JRuleSwitchItem mainSwitch = new MockSwitchItem("evcr_charger_" + number + "_switch");
+		final JRuleNumberItem amps = new MockJRuleNumberItem("evcr_charger_" + number + "_amps");
+		final JRuleNumberItem phases = new MockJRuleNumberItem("evcr_charger_" + number + "_phases");
+		final JRuleNumberItem chargePower = new MockJRuleNumberItem("evcr_charger_" + number + "_power");
 		OpenHabEnvironment mock =  Mockito.mock(OpenHabEnvironment.class);
 		Mockito.when(mock.getNumberItem(gridPower.getName())).thenReturn(gridPower);
 		Mockito.when(mock.getNumberItem(gridPowerPrice.getName())).thenReturn(gridPowerPrice);
@@ -203,12 +193,20 @@ class TestCharger {
 		return new Charger(mock, number);
 	}
 	
-	void assertFastMode(Charger charger, int number) {
+	private void sendPVData(Charger charger, double gridPower, boolean isOn, int phases, int  amps) {
+		charger.getGridPowerItem().sendCommand(gridPower);
+		charger.handlePolling();
+		assertEquals(isOn, charger.isOn());
+		assertEquals(phases, charger.getPhases());
+		assertEquals(amps, charger.getAmps());
+	}
+	
+	private void assertFastMode(Charger charger, int number) {
 		assertEquals(MODE_VALUE.FAST, charger.mode);
 		assertFast(charger, number);
 	}
 	
-	void assertFast(Charger charger, int number) {
+	private void assertFast(Charger charger, int number) {
 		assertTrue(charger.isOn());
 		assertFalse(charger.isOff());
 		assertEquals("evcr_charger_" + number, charger.name);
@@ -216,18 +214,18 @@ class TestCharger {
 		assertEquals(3, charger.getPhases());
 	}
 	
-	void assertOffMode(Charger charger, int number) {
+	private void assertOffMode(Charger charger, int number) {
 		assertEquals(MODE_VALUE.OFF, charger.mode);
 		assertOff(charger, number);
 	}
 	
-	void assertOff(Charger charger, int number) {
+	private void assertOff(Charger charger, int number) {
 		assertFalse(charger.isOn());
 		assertTrue(charger.isOff());
 		assertEquals("evcr_charger_" + number, charger.name);
 	}
 	
-	void assertRulesMode(Charger charger, int number) {
+	private void assertRulesMode(Charger charger, int number) {
 		assertEquals(MODE_VALUE.RULES, charger.mode);
 		assertEquals("evcr_charger_" + number, charger.name);
 	}

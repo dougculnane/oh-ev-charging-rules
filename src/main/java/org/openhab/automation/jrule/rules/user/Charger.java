@@ -43,31 +43,33 @@ public class Charger {
 		switchOn();
 	}
 
-	public void handleMode(String modeValue) {
+	/**
+	 * @param modeValue
+	 * @return Create lock
+	 */
+	public boolean handleMode(String modeValue) {
 		switch (modeValue) {
 		case "OFF": {
 			switchOff();
 			this.mode = MODE_VALUE.OFF;
-			break;
+			return switchOff();
 		}
 		case "FAST": {
-			activateFastCharging();
 			this.mode = MODE_VALUE.FAST;
-			break;
+			return activateFastCharging();
 		}
 		case "RULES": {
 			this.mode = MODE_VALUE.RULES;
-			handlePolling();
-			break;
+			return handlePolling();
 		}
 		default:
 			throw new IllegalArgumentException("Unexpected evcr_charger_" + number + " value: " + modeValue);
 		}
 	}
 	
-	public void handlePolling(){
+	public boolean handlePolling() {
 		if (mode != MODE_VALUE.RULES) {
-			return;
+			return false;
 		}
 		boolean fastChargingActivated = false;
 		// CO2 
@@ -90,10 +92,11 @@ public class Charger {
 		// TARGET
 		
 		if (!fastChargingActivated && enabledRules.contains(RULE_NAME.PV)) {
-			handleExportPower(getGridPowerItem().getStateAsDecimal());
+			return handleExportPower(getGridPowerItem().getStateAsDecimal());
 		} else if (!fastChargingActivated) {
-			switchOff();
+			return switchOff();
 		}
+		return false;
 	}
 
 	public boolean handleExportPower(JRuleValue state) {
@@ -141,17 +144,21 @@ public class Charger {
 		return false;
 	} 
 
-	private void switchOn() {
+	private boolean switchOn() {
 		JRuleSwitchItem switchItem = getSwitchItem();
 		if (switchItem != null && switchItem.getStateAsOnOff() != JRuleOnOffValue.ON) {
 			switchItem.sendCommand(JRuleOnOffValue.ON);
+			return true;
 		}
+		return false;
 	}
-	private void switchOff() {
+	private boolean switchOff() {
 		JRuleSwitchItem switchItem = getSwitchItem();
 		if (switchItem != null && switchItem.getStateAsOnOff() != JRuleOnOffValue.OFF) {
 			switchItem.sendCommand(JRuleOnOffValue.OFF);
+			return true;
 		}
+		return false;
 	}
 	protected boolean isOn() {
 		JRuleSwitchItem switchItem = getSwitchItem();
@@ -170,7 +177,7 @@ public class Charger {
 	protected int getAmps() {
 		return getAmpsItem().getStateAsDecimal().intValue();
 	}
-	private void setAmps(int amps) {
+	private boolean setAmps(int amps) {
 		if (amps < minAmps) {
 			amps = minAmps;
 		}
@@ -180,16 +187,20 @@ public class Charger {
 		JRuleNumberItem ampsItem = getAmpsItem();
 		if (ampsItem != null && ampsItem.getStateAsDecimal().intValue() != amps) {
 			ampsItem.sendCommand(new JRuleDecimalValue(amps));
+			return true;
 		}
+		return false;
 	}
 	protected int getPhases() {
 		return getPhasesItem().getStateAsDecimal().intValue();
 	}
-	private void setPhases(int phases) {
+	private boolean setPhases(int phases) {
 		JRuleNumberItem phasesItem = getPhasesItem();
 		if (phasesItem != null && (phasesItem.getStateAsDecimal() == null || phasesItem.getStateAsDecimal().intValue() != phases)) {
 			phasesItem.sendCommand(new JRuleDecimalValue(phases));
+			return true;
 		}
+		return false;
 	}
 	
 	private Double getMinimPhase1Power() {
@@ -198,10 +209,10 @@ public class Charger {
 	private Double getMinimPhase3Power() {
 		return Double.valueOf((240 * minAmps * 3));
 	}
-	private void activateFastCharging() {
-		switchOn();
-		setAmps(maxAmps);
-		setPhases(3);
+	private boolean activateFastCharging() {
+		return setAmps(maxAmps)
+		    | setPhases(3)
+		    | switchOn();
 	}
 	
 	public void enableRule(String ruleName) {
