@@ -1,20 +1,23 @@
 package org.openhab.automation.jrule.rules.user;
 
 import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
 
 public class EVChargingRulesCharger1 extends EVChargingRules {
 
-	
 	static final String RULE_NAME_MODE_CHANGE = "evcr_charger_1_ModeChangeRule";
 	static final String RULE_NAME_ENABLE_RULE = "evcr_charger_1_EnableRule";
 	static final String RULE_NAME_DISABLE_RULE = "evcr_charger_1_DisableRule";
 	
+	@JRuleName(RULE_NAME_MODE_CHANGE)
+	@JRuleWhenItemChange(item = "evcr_charger_1_mode")
 	public void evcr_charger_1_ModeChangeRule(JRuleItemEvent event) {
 		logInfo(RULE_NAME_MODE_CHANGE + " from: {} to: {}", event.getOldState(), event.getState());
 		if (event.getState() != null && event.getState().stringValue() != null) {
 			if (isTimeLocked(RULE_NAME_MODE_CHANGE)) {
 				logInfo(RULE_NAME_MODE_CHANGE + ": locked");
+				charger1.setModeItemValue();
 			} else if (charger1.handleMode(event.getState().stringValue())) {
 				getTimeLock(RULE_NAME_MODE_CHANGE, TIME_LOCK_FOR_CHARGER);
 	        }

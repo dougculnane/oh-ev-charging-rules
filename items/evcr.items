@@ -3,6 +3,7 @@
 
 Group	gEVCR
 
+Switch  evcr_charger_polling_switch "Poll Chargers"
 Number  evcr_export_power "Exported Power [%d W]" 						<energy>	(gEVCR)
 Number  evcr_grid_power_price "Price of grid power € [%.2f] / MWh"		<price>		(gEVCR)
 Number  evcr_cheap_power_price "Price of cheap power € [%.2f] / MWh"	<price>		(gEVCR)
@@ -11,9 +12,10 @@ Number  evcr_cheap_power_price "Price of cheap power € [%.2f] / MWh"	<price>		
 String 	evcr_charger_1_name		"Charger [%s]"			(gEVCR)
 String 	evcr_charger_1_mode 	"Charging Mode [%s]"	(gEVCR) {stateDescription="[options=OFF, FAST, RULES]"}
 Switch  evcr_charger_1_switch
-Number	evcr_charger_1_amps_min "Amps min. [%s]"		(gEVCR)
-Number	evcr_charger_1_amps_max "Amps max. [%s]"		(gEVCR)
-Number	evcr_charger_1_phases 	"Phases [%s]"			(gEVCR)
+Number	evcr_charger_1_amps		"Amps [%d]"				(gEVCR)
+// TODO Number	evcr_charger_1_amps_min "Amps min. [%s]"		(gEVCR)
+// TODO Number	evcr_charger_1_amps_max "Amps max. [%s]"		(gEVCR)
+Number	evcr_charger_1_phases 	"Phases [%d]"			(gEVCR)
 Number	evcr_charger_1_power 	"Charge Power [%d W]"	 <energy>	(gEVCR)
 
 DateTime	evcr_charger_1_timer_start 	"Charge start [%1$tH:%1$tM]"	(gEVCR)

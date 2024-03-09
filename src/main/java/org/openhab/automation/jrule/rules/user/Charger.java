@@ -3,6 +3,7 @@ package org.openhab.automation.jrule.rules.user;
 import java.util.ArrayList;
 
 import org.openhab.automation.jrule.items.JRuleNumberItem;
+import org.openhab.automation.jrule.items.JRuleStringItem;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
@@ -52,17 +53,21 @@ public class Charger {
 		case "OFF": {
 			switchOff();
 			this.mode = MODE_VALUE.OFF;
+			setModeItemValue();
 			return switchOff();
 		}
 		case "FAST": {
 			this.mode = MODE_VALUE.FAST;
+			setModeItemValue();
 			return activateFastCharging();
 		}
 		case "RULES": {
 			this.mode = MODE_VALUE.RULES;
+			setModeItemValue();
 			return handlePolling();
 		}
 		default:
+			setModeItemValue();
 			throw new IllegalArgumentException("Unexpected evcr_charger_" + number + " value: " + modeValue);
 		}
 	}
@@ -185,7 +190,7 @@ public class Charger {
 			amps = maxAmps;
 		}
 		JRuleNumberItem ampsItem = getAmpsItem();
-		if (ampsItem != null && ampsItem.getStateAsDecimal().intValue() != amps) {
+		if (ampsItem != null && (ampsItem.getStateAsDecimal() == null || ampsItem.getStateAsDecimal().intValue() != amps)) {
 			ampsItem.sendCommand(new JRuleDecimalValue(amps));
 			return true;
 		}
@@ -249,5 +254,12 @@ public class Charger {
 	}
 	private JRuleNumberItem getChargingPowerItem() {
 		return openHabEnvironment.getNumberItem("evcr_charger_" + number + "_power");
+	}
+
+	public void setModeItemValue() {
+		JRuleStringItem modeItem = openHabEnvironment.getStringItem("evcr_charger_" + number + "_mode");
+		if (modeItem != null) {
+			modeItem.sendCommand(this.mode.toString());
+		}
 	}
 }

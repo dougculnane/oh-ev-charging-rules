@@ -18,8 +18,8 @@ public class EVChargingRules extends JRule {
 	static final String CHARGER_POLLING_RULE_NAME = "evcr_charger_polling";
 	static final String RULE_NAME_EXPORT_POWER = "evcr_export_power";
 	
-	protected static final Charger charger1 = new Charger(1);
-	protected static final Charger charger2 = new Charger(2);
+	protected static Charger charger1 = new Charger(1);
+	protected static Charger charger2 = new Charger(2);
 	
 	@JRuleName(RULE_NAME_EXPORT_POWER)
 	@JRuleWhenItemChange(item = "evcr_export_power")
