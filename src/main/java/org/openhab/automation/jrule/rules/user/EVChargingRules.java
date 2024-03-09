@@ -1,15 +1,13 @@
 package org.openhab.automation.jrule.rules.user;
 
 import java.time.Duration;
-import java.util.function.Consumer;
 
-import org.openhab.automation.jrule.internal.handler.JRuleTimerHandler;
-import org.openhab.automation.jrule.internal.handler.JRuleTimerHandler.JRuleTimer;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleName;
+import org.openhab.automation.jrule.rules.JRuleWhenCronTrigger;
 import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
+import org.openhab.automation.jrule.rules.event.JRuleTimerEvent;
 
 public class EVChargingRules extends JRule {
  
@@ -28,34 +26,22 @@ public class EVChargingRules extends JRule {
 		if (isTimeLocked(RULE_NAME_EXPORT_POWER)) {
 			logInfo(RULE_NAME_EXPORT_POWER + ": locked");
 		} else {
-			if (charger1.handleExportPower(event.getState())) {
+			double wattsExported = event.getState() != null ? Double.valueOf(event.getState().toString()) : 0;
+			if (charger1.handleExportPower(wattsExported)) {
 				getTimeLock(RULE_NAME_EXPORT_POWER, TIME_LOCK_FOR_CHARGER);
-			} else if (charger2.handleExportPower(event.getState())) {
+			} else if (charger2.handleExportPower(wattsExported)) {
 				getTimeLock(RULE_NAME_EXPORT_POWER, TIME_LOCK_FOR_CHARGER);
 			}
         }
 	}
 	
 	@JRuleName(CHARGER_POLLING_RULE_NAME)
-	@JRuleWhenItemChange(item = "evcr_charger_polling_switch")
-	public void pollChargers(JRuleItemEvent event) {
-		logInfo(CHARGER_POLLING_RULE_NAME + " from: {} to: {}", event.getOldState(), event.getState());
-		if (event.getState() == JRuleOnOffValue.ON) {
-			if (isTimerRunning(CHARGER_POLLING_RULE_NAME)) {
-				return;
-			}
-			createTimer(CHARGER_POLLING_RULE_NAME, CHARGER_POLLING_DURATION, new Consumer<JRuleTimerHandler.JRuleTimer>() {
-				@Override
-				public void accept(JRuleTimer t) {
-	            	logInfo(CHARGER_POLLING_RULE_NAME + " Polling Chargers.");
-	            	if (!charger1.handlePolling()) {
-	            		charger2.handlePolling();
-	            	}
-				}
-	        });
-		} else {
-			cancelTimer(CHARGER_POLLING_RULE_NAME);
-		}
+	@JRuleWhenCronTrigger(cron = "*/10 * * * * * *")
+	public void pollChargers(JRuleTimerEvent event) {
+		logInfo(CHARGER_POLLING_RULE_NAME + " Cron Trigger.");
+		if (!charger1.handlePolling()) {
+    		charger2.handlePolling();
+    	}
 	}
 
 }

@@ -1,13 +1,10 @@
 package org.openhab.automation.jrule.rules.user;
 
-import java.util.ArrayList;
-
 import org.openhab.automation.jrule.items.JRuleNumberItem;
 import org.openhab.automation.jrule.items.JRuleStringItem;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
-import org.openhab.automation.jrule.rules.value.JRuleValue;
 
 public class Charger {
 
@@ -85,13 +82,21 @@ public class Charger {
 		// evcr-charger-1-timer-finish
 		
 		// TARGET
-		
-		if (!fastChargingActivated && isRuleEnabled(RULE_NAME.USE_EXPORT)) {
-			return handleExportPower(getGridPowerItem().getStateAsDecimal());
+		boolean useExportPowerRuleEnabled = isRuleEnabled(RULE_NAME.USE_EXPORT);
+		if (!fastChargingActivated && useExportPowerRuleEnabled) {
+			return handleExportPower(getGridPower());
 		} else if (!fastChargingActivated) {
 			return switchOff();
 		}
 		return false;
+	}
+
+	private double getGridPower() {
+		JRuleNumberItem item = getGridPowerItem();
+		if (item != null && item.getState() != null) {
+			return item.getStateAsDecimal().doubleValue();
+		}
+		return 0;
 	}
 
 	private double getChargingPower() {
@@ -118,43 +123,38 @@ public class Charger {
 		return 0;
 	}
 
-	public boolean handleExportPower(JRuleValue state) {
+	public boolean handleExportPower(double wattsExported) {
 		if (getMode() == MODE_VALUE.RULES && isRuleEnabled(RULE_NAME.USE_EXPORT)) {
-			RULE_NAME activeRule = getActiveRule();
 			// Block if other rules are active.
-			if (activeRule == null) {
-				setActiveRule(RULE_NAME.USE_EXPORT);
-			}
-			if (activeRule != RULE_NAME.USE_EXPORT) {
+			RULE_NAME activeRule = getActiveRule();
+			if (activeRule != null && activeRule != RULE_NAME.USE_EXPORT) {
 				// Then we are not in control.
 				return false;
 			}
 			
-			double kwExported = Double.parseDouble(state.stringValue());
 			double chargingPower = getChargingPower();
 			
-			if (kwExported + chargingPower > getMinimPhase1Power()) {
+			if (wattsExported + chargingPower > getMinimPhase1Power()) {
 			
 				// Phases change
-				if (getPhases() == 1 && kwExported > getMinimPhase3Power()) {
+				if (getPhases() == 1 && wattsExported > getMinimPhase3Power()) {
 					setAmps(minAmps);
 					setPhases(3);
 					return true;
-				} else if (getPhases() == null || (getPhases() == 3 && kwExported < getMinimPhase3Power())) {
+				} else if (getPhases() == null || (getPhases() == 3 && wattsExported < getMinimPhase3Power())) {
 					setPhases(1);
 					return true;
 				}
 				
-				int calcAmps = Double.valueOf((kwExported + chargingPower) / 240 / getPhases()).intValue();
+				int calcAmps = Double.valueOf((wattsExported + chargingPower) / 240 / getPhases()).intValue();
 				setAmps(calcAmps);
-				
-				if (isOff()) {
-					switchOn();
-				}
+				switchOn();
+				setActiveRule(RULE_NAME.USE_EXPORT);
 			} else {
 				switchOff();
 				setPhases(1);
 				setAmps(minAmps);
+				setActiveRule(null);
 			}
 			return true;
 		}
@@ -243,6 +243,9 @@ public class Charger {
 	public void disableRule(String ruleName) {
 		try {
 			RULE_NAME rule = RULE_NAME.valueOf(ruleName);
+			if (getActiveRule() == rule) {
+				setActiveRule(null);
+			}
 			JRuleSwitchItem item = getRuleSwitchItem(rule);
 			if (item != null && (item.getState() == null || item.getState() != JRuleOnOffValue.OFF)) {
 				item.sendCommand(JRuleOnOffValue.OFF);

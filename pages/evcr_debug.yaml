@@ -1,0 +1,109 @@
+config:
+  label: EV Charging Rules (debug)
+  sidebar: true
+blocks:
+  - component: oh-block
+    config: {}
+    slots:
+      default:
+        - component: oh-grid-row
+          config: {}
+          slots:
+            default:
+              - component: oh-grid-col
+                config: {}
+                slots:
+                  default:
+                    - component: oh-list-card
+                      config: {}
+                      slots:
+                        default: []
+        - component: oh-grid-row
+          config: {}
+          slots:
+            default:
+              - component: oh-grid-col
+                config: {}
+                slots:
+                  default:
+                    - component: oh-list-card
+                      config:
+                        accordionList: true
+                        mediaList: false
+                        simpleList: false
+                      slots:
+                        default:
+                          - component: oh-input-item
+                            config:
+                              item: evcr_charger_1_name
+                              sendButton: false
+                              title: Charger
+                          - component: oh-label-item
+                            config:
+                              action: options
+                              actionCommand: OFF,FAST,RULES
+                              actionItem: evcr_charger_1_mode
+                              actionOptions: OFF, FAST, RULES
+                              iconUseState: false
+                              item: evcr_charger_1_mode
+                              title: Mode
+                          - component: oh-label-item
+                            config:
+                              icon: oh:switch
+                              iconUseState: true
+                              item: evcr_charger_1_switch
+                              title: Charger
+                          - component: oh-label-item
+                            config:
+                              item: evcr_charger_1_phases
+                              title: Phases
+                          - component: oh-label-item
+                            config:
+                              item: evcr_charger_1_amps
+                              title: Amps
+                          - component: oh-label-item
+                            config:
+                              item: evcr_charger_1_power
+                              title: Charge power
+                          - component: oh-label-item
+                            config:
+                              item: evcr_charger_1_active_rule
+                              title: Active Rule
+                          - component: oh-label-item
+                            config:
+                              title: ="Exported power rule (" + (items.evcr_charger_1_USE_EXPORT_switch.state)
+                                + ")"
+                            slots:
+                              accordion:
+                                - component: oh-list-card
+                                  config:
+                                    accordionList: false
+                                    mediaList: false
+                                    simpleList: false
+                                  slots:
+                                    default:
+                                      - component: oh-label-item
+                                        config:
+                                          icon: oh:switch
+                                          iconUseState: true
+                                          item: evcr_charger_1_USE_EXPORT_switch
+                                          action: toggle
+                                          actionCommand: ON
+                                          actionCommandAlt: OFF
+                                          actionItem: evcr_charger_1_USE_EXPORT_switch
+                                          title: Enable USE_EXPORT rule
+                                      - component: oh-input-item
+                                        config:
+                                          sendButton: true
+                                          item: evcr_export_power
+                                          title: Exported power
+                                          inputmode: text
+                                          type: text
+              - component: oh-grid-col
+                config: {}
+                slots:
+                  default: []
+masonry: null
+grid: []
+canvas: []
+

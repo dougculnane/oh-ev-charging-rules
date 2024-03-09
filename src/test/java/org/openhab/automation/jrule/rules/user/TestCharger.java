@@ -124,6 +124,11 @@ class TestCharger {
 		sendPVData(charger1, 1500, false, 1, 8);
 		sendPVData(charger1, 1000, false, 1, 8);	
 		sendPVData(charger1, 100, false, 1, 8);
+		
+		
+		charger1.disableRule(RULE_NAME.USE_EXPORT.toString());
+		charger1.handlePolling();
+		assertNull(charger1.getActiveRule());
 	}
 	
 	@Test
@@ -151,6 +156,53 @@ class TestCharger {
 	
 	@Test
 	void testChargerModeRulesCheapActivated() {
+
+		Charger charger1 = getTestCharger(1);
+		// Rules mode.
+		charger1.handleMode("FAST");
+		charger1.enableRule(RULE_NAME.CHEAP.toString());
+		charger1.enableRule(RULE_NAME.USE_EXPORT.toString());
+		assertFastMode(charger1, 1);
+		charger1.handlePolling();
+		charger1.getGridPowerItem().sendCommand(500);
+		charger1.getCheapPowerPriceItem().sendCommand(8.08);
+		charger1.getGridPowerPriceItem().sendCommand(20.20);
+		charger1.handlePolling();
+		assertFastMode(charger1, 1);
+		charger1.handleMode("RULES");
+		charger1.handlePolling();
+		assertOff(charger1, 1);
+		charger1.getGridPowerPriceItem().sendCommand(15.15);
+		charger1.handlePolling();
+		assertOff(charger1, 1);
+		
+		//do a bit of solar
+		sendPVData(charger1, 1500, false, 1 , 8);  // switching phases so still off.
+		sendPVData(charger1, 1500, false, 1, 8);
+		sendPVData(charger1, 4500, true, 1 , 16);
+		sendPVData(charger1, 2400, true, 1, 10);
+		sendPVData(charger1, 500, false, 1 , 8);
+		assertNull(charger1.getActiveRule());
+		
+		assertOff(charger1, 1);
+		charger1.getGridPowerPriceItem().sendCommand(7.07);
+		charger1.handlePolling();
+		assertFast(charger1, 1);
+		assertEquals(RULE_NAME.CHEAP, charger1.getActiveRule());
+		charger1.getGridPowerPriceItem().sendCommand(15.15);
+		charger1.handlePolling();
+		assertNull(charger1.getActiveRule());
+		assertOff(charger1, 1);
+		charger1.getGridPowerPriceItem().sendCommand(-0.10);
+		charger1.handlePolling();
+		assertFast(charger1, 1);
+	}
+	
+	
+	@Test
+	void testChargerModeRulesCheapOverridesExported() {
+		JRuleNumberItem cheapPowerPrice = new MockJRuleNumberItem("evcr_cheap_power_price");
+		cheapPowerPrice.sendCommand(10.0);
 		Charger charger1 = getTestCharger(1);
 		// Rules mode.
 		charger1.handleMode("FAST");
@@ -215,6 +267,9 @@ class TestCharger {
 		charger.getGridPowerItem().sendCommand(gridPower);
 		charger.handlePolling();
 		assertEquals(isOn, charger.isOn());
+		if (charger.isOn()) {
+			assertTrue(charger.getActiveRule() == RULE_NAME.USE_EXPORT);
+		}
 		assertEquals(phases, charger.getPhases());
 		assertEquals(amps, charger.getAmps());
 	}

@@ -3,7 +3,6 @@
 
 Group	gEVCR
 
-Switch  evcr_charger_polling_switch "Poll Chargers [%s]"                            (gEVCR)
 Number  evcr_export_power "Exported Power [%d W]" 						<energy>	(gEVCR)
 Number  evcr_grid_power_price "Price of grid power € [%.2f] / MWh"		<price>		(gEVCR)
 Number  evcr_cheap_power_price "Price of cheap power € [%.2f] / MWh"	<price>		(gEVCR)
