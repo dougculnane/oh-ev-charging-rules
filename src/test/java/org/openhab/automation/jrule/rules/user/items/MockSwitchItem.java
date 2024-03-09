@@ -11,7 +11,7 @@ public class MockSwitchItem extends MockJRuleItem implements JRuleSwitchItem {
 	
 	public MockSwitchItem(String name) {
 		super(name);
-		this.value = JRuleOnOffValue.ON;
+		//this.value = JRuleOnOffValue.ON;
 	}
 
 	@Override

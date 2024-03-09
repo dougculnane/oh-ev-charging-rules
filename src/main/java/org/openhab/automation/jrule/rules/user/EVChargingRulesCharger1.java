@@ -17,7 +17,6 @@ public class EVChargingRulesCharger1 extends EVChargingRules {
 		if (event.getState() != null && event.getState().stringValue() != null) {
 			if (isTimeLocked(RULE_NAME_MODE_CHANGE)) {
 				logInfo(RULE_NAME_MODE_CHANGE + ": locked");
-				charger1.setModeItemValue();
 			} else if (charger1.handleMode(event.getState().stringValue())) {
 				getTimeLock(RULE_NAME_MODE_CHANGE, TIME_LOCK_FOR_CHARGER);
 	        }

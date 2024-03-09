@@ -7,8 +7,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.openhab.automation.jrule.items.JRuleNumberItem;
+import org.openhab.automation.jrule.items.JRuleStringItem;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.rules.user.items.MockJRuleNumberItem;
+import org.openhab.automation.jrule.rules.user.items.MockStringItem;
 import org.openhab.automation.jrule.rules.user.items.MockSwitchItem;
 import org.openhab.automation.jrule.rules.user.Charger.MODE_VALUE;
 import org.openhab.automation.jrule.rules.user.Charger.RULE_NAME;
@@ -46,16 +48,16 @@ class TestCharger {
 		charger1.handleMode("RULES");
 		assertRulesMode(charger1, 1);
 		charger1.handlePolling();
-		charger1.enableRule(RULE_NAME.PV.toString());
+		charger1.enableRule(RULE_NAME.USE_EXPORT.toString());
 		assertOff(charger1, 1);
 	}
 	
 	@Test
-	void testChargerModeRulesPVActivated_StreadySunUp() {
+	void testChargerModeRulesUSE_EXPORTActivated_StreadySunUp() {
 		Charger charger1 = getTestCharger(1);
 		// Rules mode.
 		charger1.handleMode("OFF");
-		charger1.enableRule(RULE_NAME.PV.toString());
+		charger1.enableRule(RULE_NAME.USE_EXPORT.toString());
 		assertOffMode(charger1, 1);
 		charger1.handlePolling();
 		charger1.handleMode("RULES");
@@ -129,11 +131,13 @@ class TestCharger {
 		Charger charger1 = getTestCharger(1);
 		// Rules mode.
 		charger1.handleMode("OFF");
-		charger1.enableRule(RULE_NAME.PV.toString());
+		charger1.enableRule(RULE_NAME.USE_EXPORT.toString());
 		assertOffMode(charger1, 1);
 		charger1.handlePolling();
 		charger1.handleMode("RULES");
-		sendPVData(charger1, 4500, true, 1 , 8);
+		sendPVData(charger1, 1500, false, 1 , 8);  // switching phases so still off.
+		sendPVData(charger1, 4500, true, 1 , 16);  
+		sendPVData(charger1, 4500, true, 1 , 16);
 		sendPVData(charger1, 5000, true, 1 , 16);
 		sendPVData(charger1, 5500, true, 1 , 16);
 		sendPVData(charger1, 6000, true, 3 , 8);
@@ -182,6 +186,8 @@ class TestCharger {
 		final JRuleNumberItem amps = new MockJRuleNumberItem("evcr_charger_" + number + "_amps");
 		final JRuleNumberItem phases = new MockJRuleNumberItem("evcr_charger_" + number + "_phases");
 		final JRuleNumberItem chargePower = new MockJRuleNumberItem("evcr_charger_" + number + "_power");
+		final JRuleStringItem mode = new MockStringItem("evcr_charger_" + number + "_mode");
+		final JRuleStringItem activeRule = new MockStringItem("evcr_charger_" + number + "_active_rule");
 		OpenHabEnvironment mock =  Mockito.mock(OpenHabEnvironment.class);
 		Mockito.when(mock.getNumberItem(gridPower.getName())).thenReturn(gridPower);
 		Mockito.when(mock.getNumberItem(gridPowerPrice.getName())).thenReturn(gridPowerPrice);
@@ -190,6 +196,8 @@ class TestCharger {
 		Mockito.when(mock.getNumberItem(amps.getName())).thenReturn(amps);
 		Mockito.when(mock.getNumberItem(phases.getName())).thenReturn(phases);
 		Mockito.when(mock.getNumberItem(chargePower.getName())).thenReturn(chargePower);
+		Mockito.when(mock.getStringItem(mode.getName())).thenReturn(mode);
+		Mockito.when(mock.getStringItem(activeRule.getName())).thenReturn(activeRule);
 		return new Charger(mock, number);
 	}
 	
@@ -202,7 +210,7 @@ class TestCharger {
 	}
 	
 	private void assertFastMode(Charger charger, int number) {
-		assertEquals(MODE_VALUE.FAST, charger.mode);
+		assertEquals(MODE_VALUE.FAST, charger.getMode());
 		assertFast(charger, number);
 	}
 	
@@ -215,7 +223,7 @@ class TestCharger {
 	}
 	
 	private void assertOffMode(Charger charger, int number) {
-		assertEquals(MODE_VALUE.OFF, charger.mode);
+		assertEquals(MODE_VALUE.OFF, charger.getMode());
 		assertOff(charger, number);
 	}
 	
@@ -226,7 +234,7 @@ class TestCharger {
 	}
 	
 	private void assertRulesMode(Charger charger, int number) {
-		assertEquals(MODE_VALUE.RULES, charger.mode);
+		assertEquals(MODE_VALUE.RULES, charger.getMode());
 		assertEquals("evcr_charger_" + number, charger.name);
 	}
 
