@@ -7,8 +7,7 @@ import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
 public class EVChargingRulesCharger1 extends EVChargingRules {
 
 	static final String RULE_NAME_MODE_CHANGE = "evcr_charger_1_ModeChangeRule";
-	static final String RULE_NAME_ENABLE_RULE = "evcr_charger_1_EnableRule";
-	static final String RULE_NAME_DISABLE_RULE = "evcr_charger_1_DisableRule";
+	static final String RULE_NAME_TOGGLE_RULE = "evcr_charger_1_ToggleRule";
 	
 	@JRuleName(RULE_NAME_MODE_CHANGE)
 	@JRuleWhenItemChange(item = "evcr_charger_1_mode")
@@ -23,20 +22,23 @@ public class EVChargingRulesCharger1 extends EVChargingRules {
 		}
 	}
 	
-	@JRuleName(RULE_NAME_ENABLE_RULE)
+	@JRuleName(RULE_NAME_TOGGLE_RULE)
+	@JRuleWhenItemChange(item = "evcr_charger_1_CHEAP_switch")
+	@JRuleWhenItemChange(item = "evcr_charger_1_USE_EXPORT_switch")
+	@JRuleWhenItemChange(item = "evcr_charger_1_TARGET_switch")
+	@JRuleWhenItemChange(item = "evcr_charger_1_TIMER_switch")
 	public void evcr_charger_1_EnableRule(JRuleItemEvent event) {
-		logInfo(RULE_NAME_ENABLE_RULE + ": {}", event.getState());
+		logInfo(RULE_NAME_TOGGLE_RULE + " {}: {}", event.getItem().getName(), event.getState());
 		if (event.getState() != null && event.getState().stringValue() != null) {
-			charger1.enableRule(event.getState().stringValue());
+			String ruleName = event.getItem().getName()
+					.replace("evcr_charger_1_", "")
+					.replace("_switch", "");
+			if (event.getState().stringValue() == "ON") {
+				charger1.enableRule(ruleName);
+			} else {
+				charger1.disableRule(ruleName);
+			}
 		}
 	}
-	
-	@JRuleName(RULE_NAME_DISABLE_RULE)
-	public void evcr_charger_1_DisableRule(JRuleItemEvent event) {
-		logInfo(RULE_NAME_DISABLE_RULE + ": {}", event.getState());
-		if (event.getState() != null && event.getState().stringValue() != null) {
-			charger1.disableRule(event.getState().stringValue());
-		}
-	}
-	
+
 }

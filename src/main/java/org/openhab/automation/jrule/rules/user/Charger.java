@@ -26,8 +26,6 @@ public class Charger {
 	
 	int number;
 	String name;
-	ArrayList<RULE_NAME> enabledRules = new ArrayList<RULE_NAME>();
-	
 	
 	public Charger(int number) {
 		this(new OpenHabEnvironment(), number);
@@ -71,7 +69,7 @@ public class Charger {
 		}
 		boolean fastChargingActivated = false;
 		// CHEAP 
-		if (!fastChargingActivated && enabledRules.contains(RULE_NAME.CHEAP)) {
+		if (!fastChargingActivated && isRuleEnabled(RULE_NAME.CHEAP)) {
 			double cheapPowerPrice = getCheapPowerPrice();
 			double gridPowerPrice = getGridPowerPrice();
 			if (cheapPowerPrice > gridPowerPrice) {
@@ -88,7 +86,7 @@ public class Charger {
 		
 		// TARGET
 		
-		if (!fastChargingActivated && enabledRules.contains(RULE_NAME.USE_EXPORT)) {
+		if (!fastChargingActivated && isRuleEnabled(RULE_NAME.USE_EXPORT)) {
 			return handleExportPower(getGridPowerItem().getStateAsDecimal());
 		} else if (!fastChargingActivated) {
 			return switchOff();
@@ -121,7 +119,7 @@ public class Charger {
 	}
 
 	public boolean handleExportPower(JRuleValue state) {
-		if (getMode() == MODE_VALUE.RULES && enabledRules.contains(RULE_NAME.USE_EXPORT)) {
+		if (getMode() == MODE_VALUE.RULES && isRuleEnabled(RULE_NAME.USE_EXPORT)) {
 			RULE_NAME activeRule = getActiveRule();
 			// Block if other rules are active.
 			if (activeRule == null) {
@@ -224,18 +222,30 @@ public class Charger {
 		    | switchOn();
 	}
 	
+	boolean isRuleEnabled(RULE_NAME ruleName) {
+		JRuleSwitchItem item = getRuleSwitchItem(ruleName);
+		return item != null 
+				&& item.getState() != null 
+				&& item.getStateAsOnOff() == JRuleOnOffValue.ON;
+	}
+	
 	public void enableRule(String ruleName) {
-		RULE_NAME rule = RULE_NAME.valueOf(ruleName);
-		if (!enabledRules.contains(rule)) {
-			enabledRules.add(rule);		
+		try {
+			RULE_NAME rule = RULE_NAME.valueOf(ruleName);
+			JRuleSwitchItem item = getRuleSwitchItem(rule);
+			if (item != null && (item.getState() == null || item.getState() != JRuleOnOffValue.ON)) {
+				item.sendCommand(JRuleOnOffValue.ON);
+			}
+		} catch (IllegalArgumentException e) {
 		}
 	}
 
 	public void disableRule(String ruleName) {
 		try {
 			RULE_NAME rule = RULE_NAME.valueOf(ruleName);
-			if (enabledRules.contains(rule)) {
-				enabledRules.remove(rule);
+			JRuleSwitchItem item = getRuleSwitchItem(rule);
+			if (item != null && (item.getState() == null || item.getState() != JRuleOnOffValue.OFF)) {
+				item.sendCommand(JRuleOnOffValue.OFF);
 			}
 		} catch (IllegalArgumentException e) {
 		}
@@ -293,7 +303,9 @@ public class Charger {
 		}
 		return false;
 	}
-	
+	private JRuleSwitchItem getRuleSwitchItem(RULE_NAME ruleName) {
+		return openHabEnvironment.getSwitchItem("evcr_charger_" + number + "_" + ruleName.toString() + "_switch");
+	}
 	private JRuleSwitchItem getSwitchItem() {
 		return openHabEnvironment.getSwitchItem("evcr_charger_" + number + "_switch");
 	}

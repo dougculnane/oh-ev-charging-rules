@@ -136,6 +136,8 @@ class TestCharger {
 		charger1.handlePolling();
 		charger1.handleMode("RULES");
 		sendPVData(charger1, 1500, false, 1 , 8);  // switching phases so still off.
+		sendPVData(charger1, 1500, false, 1, 8);
+		sendPVData(charger1, 3200, true, 1 , 13);
 		sendPVData(charger1, 4500, true, 1 , 16);  
 		sendPVData(charger1, 4500, true, 1 , 16);
 		sendPVData(charger1, 5000, true, 1 , 16);
@@ -188,6 +190,10 @@ class TestCharger {
 		final JRuleNumberItem chargePower = new MockJRuleNumberItem("evcr_charger_" + number + "_power");
 		final JRuleStringItem mode = new MockStringItem("evcr_charger_" + number + "_mode");
 		final JRuleStringItem activeRule = new MockStringItem("evcr_charger_" + number + "_active_rule");
+		final JRuleSwitchItem rule_CHEAP_switch	= new MockSwitchItem("evcr_charger_" + number + "_CHEAP_switch");
+		final JRuleSwitchItem rule_USE_EXPORT_switch = new MockSwitchItem("evcr_charger_" + number + "_USE_EXPORT_switch");
+		final JRuleSwitchItem rule_TARGET_switch = new MockSwitchItem("evcr_charger_" + number + "_TARGET_switch");
+		final JRuleSwitchItem rule_TIMER_switch	= new MockSwitchItem("evcr_charger_" + number + "_TIMER_switch");
 		OpenHabEnvironment mock =  Mockito.mock(OpenHabEnvironment.class);
 		Mockito.when(mock.getNumberItem(gridPower.getName())).thenReturn(gridPower);
 		Mockito.when(mock.getNumberItem(gridPowerPrice.getName())).thenReturn(gridPowerPrice);
@@ -198,6 +204,10 @@ class TestCharger {
 		Mockito.when(mock.getNumberItem(chargePower.getName())).thenReturn(chargePower);
 		Mockito.when(mock.getStringItem(mode.getName())).thenReturn(mode);
 		Mockito.when(mock.getStringItem(activeRule.getName())).thenReturn(activeRule);
+		Mockito.when(mock.getSwitchItem(rule_CHEAP_switch.getName())).thenReturn(rule_CHEAP_switch);
+		Mockito.when(mock.getSwitchItem(rule_USE_EXPORT_switch.getName())).thenReturn(rule_USE_EXPORT_switch);
+		Mockito.when(mock.getSwitchItem(rule_TARGET_switch.getName())).thenReturn(rule_TARGET_switch);
+		Mockito.when(mock.getSwitchItem(rule_TIMER_switch.getName())).thenReturn(rule_TIMER_switch);
 		return new Charger(mock, number);
 	}
 	
