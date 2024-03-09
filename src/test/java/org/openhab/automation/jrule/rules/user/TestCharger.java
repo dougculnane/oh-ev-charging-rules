@@ -176,7 +176,7 @@ class TestCharger {
 		charger1.handlePolling();
 		assertOff(charger1, 1);
 		
-		//do a bit of solar
+		//do a bit of solar then stop
 		sendPVData(charger1, 1500, false, 1 , 8);  // switching phases so still off.
 		sendPVData(charger1, 1500, false, 1, 8);
 		sendPVData(charger1, 4500, true, 1 , 16);
@@ -196,6 +196,21 @@ class TestCharger {
 		charger1.getGridPowerPriceItem().sendCommand(-0.10);
 		charger1.handlePolling();
 		assertFast(charger1, 1);
+		charger1.getGridPowerPriceItem().sendCommand(15.15);
+		charger1.handlePolling();
+		assertOff(charger1, 1);
+		
+		//do a bit of solar then stop
+		sendPVData(charger1, 1500, false, 1 , 8);  // switching phases so still off.
+		sendPVData(charger1, 1500, false, 1, 8);
+		sendPVData(charger1, 4500, true, 1, 16);
+		sendPVData(charger1, 2400, true, 1, 10);
+		sendPVData(charger1, 5000, true, 1, 16);
+		assertEquals(RULE_NAME.USE_EXPORT, charger1.getActiveRule());
+		charger1.getGridPowerPriceItem().sendCommand(-0.10);
+		charger1.handlePolling();
+		assertFast(charger1, 1);
+		assertEquals(RULE_NAME.CHEAP, charger1.getActiveRule());
 	}
 	
 	
