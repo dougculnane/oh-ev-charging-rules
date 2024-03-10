@@ -65,6 +65,11 @@ public class Charger {
 			return false;
 		}
 		boolean fastChargingActivated = false;
+		
+		// TIMER
+		// evcr_charger_1_TIMER_start
+		// evcr_charger_1_TIMER_finish
+		
 		// CHEAP 
 		if (!fastChargingActivated && isRuleEnabled(RULE_NAME.CHEAP)) {
 			double cheapPowerPrice = getCheapPowerPrice();
@@ -77,13 +82,11 @@ public class Charger {
 				setActiveRule(null);
 			}
 		}
-		// TIMER
-		// evcr-charger-1-timer-start
-		// evcr-charger-1-timer-finish
 		
 		// TARGET
-		boolean useExportPowerRuleEnabled = isRuleEnabled(RULE_NAME.USE_EXPORT);
-		if (!fastChargingActivated && useExportPowerRuleEnabled) {
+		
+		// USE Export or switch off
+		if (!fastChargingActivated && isRuleEnabled(RULE_NAME.USE_EXPORT)) {
 			return handleExportPower(getGridPower());
 		} else if (!fastChargingActivated) {
 			return switchOff();

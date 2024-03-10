@@ -71,6 +71,78 @@ blocks:
                               title: Active Rule
                           - component: oh-label-item
                             config:
+                              title: ="Timer rule (" + (items.evcr_charger_1_TIMER_switch.state) + ")"
+                            slots:
+                              accordion:
+                                - component: oh-list-card
+                                  config:
+                                    accordionList: false
+                                    mediaList: false
+                                    simpleList: false
+                                  slots:
+                                    default:
+                                      - component: oh-label-item
+                                        config:
+                                          icon: oh:switch
+                                          iconUseState: true
+                                          item: evcr_charger_1_TIMER_switch
+                                          action: toggle
+                                          actionCommand: ON
+                                          actionCommandAlt: OFF
+                                          actionItem: evcr_charger_1_TIMER_switch
+                                          title: Enable TIMER rule
+                                      - component: oh-input-item
+                                        config:
+                                          sendButton: true
+                                          item: evcr_charger_1_TIMER_start
+                                          title: Timer start
+                                          inputmode: text
+                                          type: text
+                                      - component: oh-input-item
+                                        config:
+                                          sendButton: true
+                                          item: evcr_charger_1_TIMER_finish
+                                          title: Timer finish
+                                          inputmode: text
+                                          type: text
+                          - component: oh-label-item
+                            config:
+                              title: ="Cheap power rule (" + (items.evcr_charger_1_CHEAP_switch.state) + ")"
+                            slots:
+                              accordion:
+                                - component: oh-list-card
+                                  config:
+                                    accordionList: false
+                                    mediaList: false
+                                    simpleList: false
+                                  slots:
+                                    default:
+                                      - component: oh-label-item
+                                        config:
+                                          icon: oh:switch
+                                          iconUseState: true
+                                          item: evcr_charger_1_CHEAP_switch
+                                          action: toggle
+                                          actionCommand: ON
+                                          actionCommandAlt: OFF
+                                          actionItem: evcr_charger_1_CHEAP_switch
+                                          title: Enable CHEAP rule
+                                      - component: oh-input-item
+                                        config:
+                                          sendButton: true
+                                          item: evcr_cheap_power_price
+                                          title: Cheap power price
+                                          inputmode: text
+                                          type: text
+                                      - component: oh-input-item
+                                        config:
+                                          sendButton: true
+                                          item: evcr_grid_power_price
+                                          title: Grid power price
+                                          inputmode: text
+                                          type: text
+                          - component: oh-label-item
+                            config:
                               title: ="Exported power rule (" + (items.evcr_charger_1_USE_EXPORT_switch.state)
                                 + ")"
                             slots:
@@ -106,4 +178,3 @@ blocks:
 masonry: null
 grid: []
 canvas: []
-
