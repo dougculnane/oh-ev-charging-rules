@@ -2,6 +2,7 @@ package org.openhab.automation.jrule.rules.user;
 
 import java.util.Optional;
 
+import org.openhab.automation.jrule.items.JRuleDateTimeItem;
 import org.openhab.automation.jrule.items.JRuleNumberItem;
 import org.openhab.automation.jrule.items.JRuleStringItem;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
@@ -26,6 +27,14 @@ public class OpenHabEnvironment {
 	
 	public JRuleStringItem getStringItem(String name) {
 		Optional<JRuleStringItem> itemOption = JRuleStringItem.forNameOptional(name);
+		if (itemOption.isPresent()) {
+			return itemOption.get();
+		}
+		return null;
+	}
+
+	public JRuleDateTimeItem getDateTimeItem(String name) {
+		Optional<JRuleDateTimeItem> itemOption = JRuleDateTimeItem.forNameOptional(name);
 		if (itemOption.isPresent()) {
 			return itemOption.get();
 		}

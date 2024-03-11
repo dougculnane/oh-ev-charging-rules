@@ -14,11 +14,11 @@ public class EVChargingRulesCharger1 extends EVChargingRules {
 	public void evcr_charger_1_ModeChangeRule(JRuleItemEvent event) {
 		logInfo(RULE_NAME_MODE_CHANGE + " from: {} to: {}", event.getOldState(), event.getState());
 		if (event.getState() != null && event.getState().stringValue() != null) {
-			if (isTimeLocked(RULE_NAME_MODE_CHANGE)) {
-				logInfo(RULE_NAME_MODE_CHANGE + ": locked");
+			if (isTimeLocked(CHARGER_1_LOCK_NAME)) {
+				logInfo(CHARGER_1_LOCK_NAME + ": locked so skipping mode change");
 			} else if (charger1.handleMode(event.getState().stringValue())) {
-				getTimeLock(RULE_NAME_MODE_CHANGE, TIME_LOCK_FOR_CHARGER);
-	        }
+				getTimeLock(CHARGER_1_LOCK_NAME, TIME_LOCK_FOR_CHARGER);
+			}
 		}
 	}
 	
@@ -37,6 +37,10 @@ public class EVChargingRulesCharger1 extends EVChargingRules {
 				charger1.enableRule(ruleName);
 			} else {
 				charger1.disableRule(ruleName);
+			}
+			
+			if (!isTimeLocked(CHARGER_1_LOCK_NAME) && charger1.handlePolling()) {
+				getTimeLock(CHARGER_1_LOCK_NAME, TIME_LOCK_FOR_CHARGER);
 			}
 		}
 	}

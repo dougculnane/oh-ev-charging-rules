@@ -2,6 +2,8 @@ package org.openhab.automation.jrule.rules.user;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Calendar;
+
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -21,24 +23,24 @@ class TestCharger {
 	@Test
 	void testChargerInit_FastMode() {
 		Charger charger1 = getTestCharger(1);
-		assertFastMode(charger1, 1);
+		assertFastMode(charger1);
 	}
 		
 	@Test
 	void testChargerModeSwitching() {
 		Charger charger1 = getTestCharger(1);
 		charger1.handleMode("OFF");
-		assertOffMode(charger1, 1);
+		assertOffMode(charger1);
 		charger1.handleMode("FAST");
-		assertFastMode(charger1, 1);	
+		assertFastMode(charger1);	
 		charger1.handleMode("RULES");
-		assertRulesMode(charger1, 1);
+		assertRulesMode(charger1);
 		charger1.handleMode("FAST");
-		assertFastMode(charger1, 1);
+		assertFastMode(charger1);
 		charger1.handleMode("RULES");
-		assertRulesMode(charger1, 1);
+		assertRulesMode(charger1);
 		charger1.handleMode("OFF");
-		assertOffMode(charger1, 1);
+		assertOffMode(charger1);
 	}
 	
 	@Test
@@ -46,10 +48,10 @@ class TestCharger {
 		Charger charger1 = getTestCharger(1);
 		// Rules mode.
 		charger1.handleMode("RULES");
-		assertRulesMode(charger1, 1);
+		assertRulesMode(charger1);
 		charger1.handlePolling();
 		charger1.enableRule(RULE_NAME.USE_EXPORT.toString());
-		assertOff(charger1, 1);
+		assertOff(charger1);
 	}
 	
 	@Test
@@ -58,7 +60,7 @@ class TestCharger {
 		// Rules mode.
 		charger1.handleMode("OFF");
 		charger1.enableRule(RULE_NAME.USE_EXPORT.toString());
-		assertOffMode(charger1, 1);
+		assertOffMode(charger1);
 		charger1.handlePolling();
 		charger1.handleMode("RULES");
 		sendPVData(charger1, 100, false, 1, 8);
@@ -137,7 +139,7 @@ class TestCharger {
 		// Rules mode.
 		charger1.handleMode("OFF");
 		charger1.enableRule(RULE_NAME.USE_EXPORT.toString());
-		assertOffMode(charger1, 1);
+		assertOffMode(charger1);
 		charger1.handlePolling();
 		charger1.handleMode("RULES");
 		sendPVData(charger1, 1500, false, 1 , 8);  // switching phases so still off.
@@ -162,19 +164,19 @@ class TestCharger {
 		charger1.handleMode("FAST");
 		charger1.enableRule(RULE_NAME.CHEAP.toString());
 		charger1.enableRule(RULE_NAME.USE_EXPORT.toString());
-		assertFastMode(charger1, 1);
+		assertFastMode(charger1);
 		charger1.handlePolling();
-		charger1.getGridPowerItem().sendCommand(500);
+		charger1.getExportPowerItem().sendCommand(500);
 		charger1.getCheapPowerPriceItem().sendCommand(8.08);
 		charger1.getGridPowerPriceItem().sendCommand(20.20);
 		charger1.handlePolling();
-		assertFastMode(charger1, 1);
+		assertFastMode(charger1);
 		charger1.handleMode("RULES");
 		charger1.handlePolling();
-		assertOff(charger1, 1);
+		assertOff(charger1);
 		charger1.getGridPowerPriceItem().sendCommand(15.15);
 		charger1.handlePolling();
-		assertOff(charger1, 1);
+		assertOff(charger1);
 		
 		//do a bit of solar then stop
 		sendPVData(charger1, 1500, false, 1 , 8);  // switching phases so still off.
@@ -184,21 +186,21 @@ class TestCharger {
 		sendPVData(charger1, 500, false, 1 , 8);
 		assertNull(charger1.getActiveRule());
 		
-		assertOff(charger1, 1);
+		assertOff(charger1);
 		charger1.getGridPowerPriceItem().sendCommand(7.07);
 		charger1.handlePolling();
-		assertFast(charger1, 1);
+		assertFast(charger1);
 		assertEquals(RULE_NAME.CHEAP, charger1.getActiveRule());
 		charger1.getGridPowerPriceItem().sendCommand(15.15);
 		charger1.handlePolling();
 		assertNull(charger1.getActiveRule());
-		assertOff(charger1, 1);
+		assertOff(charger1);
 		charger1.getGridPowerPriceItem().sendCommand(-0.10);
 		charger1.handlePolling();
-		assertFast(charger1, 1);
+		assertFast(charger1);
 		charger1.getGridPowerPriceItem().sendCommand(15.15);
 		charger1.handlePolling();
-		assertOff(charger1, 1);
+		assertOff(charger1);
 		
 		//do a bit of solar then stop
 		sendPVData(charger1, 1500, false, 1 , 8);  // switching phases so still off.
@@ -209,7 +211,7 @@ class TestCharger {
 		assertEquals(RULE_NAME.USE_EXPORT, charger1.getActiveRule());
 		charger1.getGridPowerPriceItem().sendCommand(-0.10);
 		charger1.handlePolling();
-		assertFast(charger1, 1);
+		assertFast(charger1);
 		assertEquals(RULE_NAME.CHEAP, charger1.getActiveRule());
 	}
 	
@@ -222,29 +224,52 @@ class TestCharger {
 		// Rules mode.
 		charger1.handleMode("FAST");
 		charger1.enableRule(RULE_NAME.CHEAP.toString());
-		assertFastMode(charger1, 1);
+		assertFastMode(charger1);
 		charger1.handlePolling();
 		charger1.getCheapPowerPriceItem().sendCommand(0.08);
 		charger1.getGridPowerPriceItem().sendCommand(0.20);
 		charger1.handlePolling();
-		assertFastMode(charger1, 1);
+		assertFastMode(charger1);
 		charger1.handleMode("RULES");
-		assertOff(charger1, 1);
+		assertOff(charger1);
 		charger1.getGridPowerPriceItem().sendCommand(0.15);
 		charger1.handlePolling();
-		assertOff(charger1, 1);
+		assertOff(charger1);
 		charger1.getGridPowerPriceItem().sendCommand(0.08);
 		charger1.handlePolling();
-		assertOff(charger1, 1);
+		assertOff(charger1);
 		charger1.getGridPowerPriceItem().sendCommand(0.07);
 		charger1.handlePolling();
-		assertFast(charger1, 1);
+		assertFast(charger1);
 		charger1.getGridPowerPriceItem().sendCommand(0.15);
 		charger1.handlePolling();
-		assertOff(charger1, 1);
+		assertOff(charger1);
 		charger1.getGridPowerPriceItem().sendCommand(-0.10);
 		charger1.handlePolling();
-		assertFast(charger1, 1);
+		assertFast(charger1);
+	}
+	
+	@Test
+	void testTimer() {
+		Charger charger = getTestCharger(3);
+		// Rules mode.
+		charger.handleMode("FAST");
+		charger.enableRule(RULE_NAME.TIMER.toString());
+		assertFastMode(charger);
+		charger.handlePolling();
+		charger.getTimerStartItem().sendCommand("02:00");
+		charger.getTimerFinishItem().sendCommand("02:00");
+		charger.handlePolling();
+		assertFastMode(charger);
+		charger.handleMode("RULES");
+		assertOff(charger);
+		Calendar cal = Calendar.getInstance();
+		charger.getTimerStartItem().sendCommand(cal.get(Calendar.HOUR_OF_DAY) + ":00");
+		cal.add(Calendar.HOUR_OF_DAY,1);
+		charger.getTimerFinishItem().sendCommand(cal.get(Calendar.HOUR_OF_DAY) + ":00");
+		charger.handlePolling();
+		assertFast(charger);
+		assertEquals(RULE_NAME.TIMER, charger.getActiveRule());
 	}
 	
 	private Charger getTestCharger(int number) {
@@ -261,6 +286,9 @@ class TestCharger {
 		final JRuleSwitchItem rule_USE_EXPORT_switch = new MockSwitchItem("evcr_charger_" + number + "_USE_EXPORT_switch");
 		final JRuleSwitchItem rule_TARGET_switch = new MockSwitchItem("evcr_charger_" + number + "_TARGET_switch");
 		final JRuleSwitchItem rule_TIMER_switch	= new MockSwitchItem("evcr_charger_" + number + "_TIMER_switch");
+		final JRuleStringItem evcr_charger_TIMER_start = new MockStringItem("evcr_charger_" + number + "_TIMER_start");
+		final JRuleStringItem evcr_charger_TIMER_finish = new MockStringItem("evcr_charger_" + number + "_TIMER_finish");
+		final JRuleSwitchItem rule_BEST_PRICE_switch = new MockSwitchItem("evcr_charger_" + number + "_BEST_PRICE_switch");
 		OpenHabEnvironment mock =  Mockito.mock(OpenHabEnvironment.class);
 		Mockito.when(mock.getNumberItem(gridPower.getName())).thenReturn(gridPower);
 		Mockito.when(mock.getNumberItem(gridPowerPrice.getName())).thenReturn(gridPowerPrice);
@@ -275,47 +303,52 @@ class TestCharger {
 		Mockito.when(mock.getSwitchItem(rule_USE_EXPORT_switch.getName())).thenReturn(rule_USE_EXPORT_switch);
 		Mockito.when(mock.getSwitchItem(rule_TARGET_switch.getName())).thenReturn(rule_TARGET_switch);
 		Mockito.when(mock.getSwitchItem(rule_TIMER_switch.getName())).thenReturn(rule_TIMER_switch);
+		Mockito.when(mock.getSwitchItem(rule_BEST_PRICE_switch.getName())).thenReturn(rule_BEST_PRICE_switch);
+		Mockito.when(mock.getStringItem(evcr_charger_TIMER_start.getName())).thenReturn(evcr_charger_TIMER_start);
+		Mockito.when(mock.getStringItem(evcr_charger_TIMER_finish.getName())).thenReturn(evcr_charger_TIMER_finish);
 		return new Charger(mock, number);
 	}
 	
 	private void sendPVData(Charger charger, double gridPower, boolean isOn, int phases, int  amps) {
-		charger.getGridPowerItem().sendCommand(gridPower);
+		charger.getExportPowerItem().sendCommand(gridPower);
 		charger.handlePolling();
 		assertEquals(isOn, charger.isOn());
 		if (charger.isOn()) {
 			assertTrue(charger.getActiveRule() == RULE_NAME.USE_EXPORT);
+		} else {
+			assertTrue(charger.getActiveRule() != RULE_NAME.USE_EXPORT);
 		}
 		assertEquals(phases, charger.getPhases());
 		assertEquals(amps, charger.getAmps());
 	}
 	
-	private void assertFastMode(Charger charger, int number) {
+	private void assertFastMode(Charger charger) {
 		assertEquals(MODE_VALUE.FAST, charger.getMode());
-		assertFast(charger, number);
+		assertFast(charger);
 	}
 	
-	private void assertFast(Charger charger, int number) {
+	private void assertFast(Charger charger) {
 		assertTrue(charger.isOn());
 		assertFalse(charger.isOff());
-		assertEquals("evcr_charger_" + number, charger.name);
+		assertEquals("evcr_charger_" + charger.number, charger.name);
 		assertEquals(charger.maxAmps, charger.getAmps());
 		assertEquals(3, charger.getPhases());
 	}
 	
-	private void assertOffMode(Charger charger, int number) {
+	private void assertOffMode(Charger charger) {
 		assertEquals(MODE_VALUE.OFF, charger.getMode());
-		assertOff(charger, number);
+		assertOff(charger);
 	}
 	
-	private void assertOff(Charger charger, int number) {
+	private void assertOff(Charger charger) {
 		assertFalse(charger.isOn());
 		assertTrue(charger.isOff());
-		assertEquals("evcr_charger_" + number, charger.name);
+		assertEquals("evcr_charger_" + charger.number, charger.name);
 	}
 	
-	private void assertRulesMode(Charger charger, int number) {
+	private void assertRulesMode(Charger charger) {
 		assertEquals(MODE_VALUE.RULES, charger.getMode());
-		assertEquals("evcr_charger_" + number, charger.name);
+		assertEquals("evcr_charger_" + charger.number, charger.name);
 	}
 
 }
