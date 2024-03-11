@@ -28,7 +28,6 @@ public class Charger {
 	int maxAmps = 16;
 	
 	int number;
-	String name;
 	int carNumber = 1;
 	
 	public Charger(int number) {
@@ -38,10 +37,17 @@ public class Charger {
 	public Charger(OpenHabEnvironment openHabEnvironment, int number) {
 		this.openHabEnvironment = openHabEnvironment;
 		this.number = number;
-		this.name = "evcr_charger_" + number;
 		setAmps(maxAmps);
 		setPhases(3);
 		switchOn();
+	}
+	
+	public String getName() {
+		JRuleStringItem item = getNameItem();
+		if (item != null && item.getState() != null) {
+			return item.getStateAsString();
+		}
+		return "evcr_charger_" + number;
 	}
 
 	/**
@@ -71,10 +77,10 @@ public class Charger {
 		if (getMode() != MODE_VALUE.RULES) {
 			return false;
 		}
-//        if (getConnectedCar().targetLevelReached() ) {
-//        	setActiveRule(RULE_NAME.TARGET);
-//        	return switchOff();
-//        }
+        if (getConnectedCar().targetLevelReached() ) {
+        	setActiveRule(RULE_NAME.TARGET);
+        	return switchOff();
+        }
 		
 		boolean fastChargingActivated = false;
 		
@@ -466,5 +472,7 @@ public class Charger {
 	protected JRuleStringItem getTimerStartItem() {
 		return openHabEnvironment.getStringItem("evcr_charger_" + number + "_TIMER_start");
 	}
-	
+	protected JRuleStringItem getNameItem() {
+		return openHabEnvironment.getStringItem("evcr_charger_" + number + "_name");
+	}
 }

@@ -10,14 +10,19 @@ public class Car {
 	final private OpenHabEnvironment openHabEnvironment;
 	
 	int number;
-	String name;
 	
 	public Car(OpenHabEnvironment openHabEnvironment, int number) {
 		this.openHabEnvironment = openHabEnvironment;
 		this.number = number;
-		this.name = "evcr_car_" + number;
 	}
 	
+	public String getName() {
+		JRuleStringItem item = getNameItem();
+		if (item != null && item.getState() != null) {
+			return item.getStateAsString();
+		}
+		return "evcr_car_" + number;
+	}
 	
 	public int getMinutesNeededForTarget(double chargeRateWatts) {
 		int target = getTargetLevel();;
@@ -41,8 +46,6 @@ public class Car {
 		// TODO Auto-generated method stub
 		return 50;
 	}
-
-	
 	
 	private int getBatteryLevel() {
 		JRuleNumberItem item = getBatteryLevelItem();
@@ -75,7 +78,6 @@ public class Car {
 		return null;
 	}
 	
-	
 	protected JRuleNumberItem getBatteryLevelItem() {
 		return openHabEnvironment.getNumberItem("evcr_car_" + number + "_battery_level");
 	}
@@ -85,8 +87,8 @@ public class Car {
 	protected JRuleStringItem getTargetTimeItem() {
 		return openHabEnvironment.getStringItem("evcr_car_" + number + "_target_time");
 	}
-
-
-
+	protected JRuleStringItem getNameItem() {
+		return openHabEnvironment.getStringItem("evcr_car_" + number + "_name");
+	}
 	
 }

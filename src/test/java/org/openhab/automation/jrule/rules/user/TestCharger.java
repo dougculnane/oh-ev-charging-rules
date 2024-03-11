@@ -330,7 +330,7 @@ class TestCharger {
 	private void assertFast(Charger charger) {
 		assertTrue(charger.isOn());
 		assertFalse(charger.isOff());
-		assertEquals("evcr_charger_" + charger.number, charger.name);
+		assertEquals("evcr_charger_" + charger.number, charger.getName());
 		assertEquals(charger.maxAmps, charger.getAmps());
 		assertEquals(3, charger.getPhases());
 	}
@@ -343,12 +343,12 @@ class TestCharger {
 	private void assertOff(Charger charger) {
 		assertFalse(charger.isOn());
 		assertTrue(charger.isOff());
-		assertEquals("evcr_charger_" + charger.number, charger.name);
+		assertEquals("evcr_charger_" + charger.number, charger.getName());
 	}
 	
 	private void assertRulesMode(Charger charger) {
 		assertEquals(MODE_VALUE.RULES, charger.getMode());
-		assertEquals("evcr_charger_" + charger.number, charger.name);
+		assertEquals("evcr_charger_" + charger.number, charger.getName());
 	}
 
 }
