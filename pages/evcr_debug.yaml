@@ -145,7 +145,7 @@ blocks:
                                           type: text
                           - component: oh-label-item
                             config:
-                              title: ="Best Price rule (" + (items.evcr_charger_1_BEST_PRICE_switch.state) +
+                              title: ="Best grid rule (" + (items.evcr_charger_1_BEST_GRID_switch.state) +
                                 ")"
                               icon: material:rule_folder
                             slots:
@@ -162,18 +162,18 @@ blocks:
                                           action: toggle
                                           actionCommand: ON
                                           actionCommandAlt: OFF
-                                          actionItem: evcr_charger_1_BEST_PRICE_switch
+                                          actionItem: evcr_charger_1_BEST_GRID_switch
                                           icon: oh:switch
                                           iconUseState: true
-                                          item: evcr_charger_1_BEST_PRICE_switch
-                                          title: Enable BEST_PRICE rule
+                                          item: evcr_charger_1_BEST_GRID_switch
+                                          title: Enable BEST_GRID rule
                                       - component: oh-label-item
                                         config:
-                                          item: evcr_charger_1_BEST_PRICE_start
+                                          item: evcr_charger_1_BEST_GRID_start
                                           title: Timer start
                                       - component: oh-label-item
                                         config:
-                                          item: evcr_charger_1_BEST_PRICE_finish
+                                          item: evcr_charger_1_BEST_GRID_finish
                                           title: Timer finish
                           - component: oh-label-item
                             config:

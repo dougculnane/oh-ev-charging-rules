@@ -19,9 +19,9 @@ Number	evcr_charger_1_phases 	"Phases [%d]"			(gEVCR)
 Number	evcr_charger_1_power 	"Charge Power [%d W]"	 <energy>	(gEVCR)
 Switch	evcr_charger_1_CHEAP_switch			"Use cheap power rule [%s]" 	(gEVCR)
 
-Switch	evcr_charger_1_BEST_PRICE_switch	"Use best price period rule [%s]" 	(gEVCR)
-DateTime evcr_charger_1_BEST_PRICE_start	"Best price start [%1$tH:%1$tM]"	<time>	(gEVCR)
-DateTime evcr_charger_1_BEST_PRICE_finish	"Best price finish [%1$tH:%1$tM]"	<time>	(gEVCR)
+Switch	evcr_charger_1_BEST_GRID_switch		"Use best grid period rule [%s]" 	(gEVCR)
+DateTime evcr_charger_1_BEST_GRID_start		"Best grid start [%1$tH:%1$tM]"	<time>	(gEVCR)
+DateTime evcr_charger_1_BEST_GRID_finish	"Best grid finish [%1$tH:%1$tM]"	<time>	(gEVCR)
 
 Switch	evcr_charger_1_USE_EXPORT_switch	"Use exported power rule [%s]" 	(gEVCR)
 Switch	evcr_charger_1_TARGET_switch		"Charge to target rule [%s]" 	(gEVCR)

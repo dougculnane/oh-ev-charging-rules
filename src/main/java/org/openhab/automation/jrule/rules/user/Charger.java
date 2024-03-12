@@ -21,14 +21,13 @@ public class Charger {
 	}
 	
 	enum RULE_NAME {
-		CHEAP, BEST_PRICE, USE_EXPORT, TARGET, TIMER
+		CHEAP, BEST_GRID, USE_EXPORT, TARGET, TIMER
 	}
 	
 	int minAmps = 8;
 	int maxAmps = 16;
 	
 	int number;
-	int carNumber = 1;
 	
 	public Charger(int number) {
 		this(new OpenHabEnvironment(), number);
@@ -77,7 +76,8 @@ public class Charger {
 		if (getMode() != MODE_VALUE.RULES) {
 			return false;
 		}
-        if (getConnectedCar().targetLevelReached() ) {
+		final Car car = getConnectedCar();
+		if (car != null && car.targetLevelReached() ) {
         	setActiveRule(RULE_NAME.TARGET);
         	return switchOff();
         }
@@ -112,8 +112,8 @@ public class Charger {
 			}
 		}
 		
-		// BEST_PRICE
-		if (!fastChargingActivated && isRuleEnabled(RULE_NAME.BEST_PRICE)) {
+		// BEST_GRID
+		if (!fastChargingActivated && isRuleEnabled(RULE_NAME.BEST_GRID)) {
 			ZonedDateTime now = ZonedDateTime.now();
 			ZonedDateTime bestPriceStart = getBestPriceStart();
 			ZonedDateTime bestPriceFinish = getBestPriceFinish();
@@ -121,17 +121,16 @@ public class Charger {
 					&& bestPriceFinish != null
 					&& now.isAfter(bestPriceStart) 
 					&& now.isBefore(bestPriceFinish)) {
-				setActiveRule(RULE_NAME.BEST_PRICE);
+				setActiveRule(RULE_NAME.BEST_GRID);
 				fastChargingActivated = true;
-			} else if (getActiveRule() == RULE_NAME.BEST_PRICE) {
+			} else if (getActiveRule() == RULE_NAME.BEST_GRID) {
 				setActiveRule(null);
 			}
 		}
 		
 		// TARGET
-		if (!fastChargingActivated && isRuleEnabled(RULE_NAME.TARGET)) {
+		if (!fastChargingActivated && car != null && isRuleEnabled(RULE_NAME.TARGET)) {
 			
-			Car car = getConnectedCar();
 			int neededMins = car.getMinutesNeededForTarget(240 * this.maxAmps * 3);
 			Calendar now = Calendar.getInstance();
 			Calendar cal = car.getTargetTime();
@@ -158,7 +157,11 @@ public class Charger {
 
 
 	private Car getConnectedCar() {
-		return new Car(openHabEnvironment, carNumber);
+		JRuleNumberItem item = getConnectedCarItem();
+		if (item != null && item.getState() != null) {
+			return new Car(openHabEnvironment, item.getStateAsDecimal().intValue());
+		}
+		return null;
 	}
 
 	private Date getTimerFinish() {
@@ -427,8 +430,6 @@ public class Charger {
 		}
 		return null;
 	}
-
-
 	
 	private JRuleSwitchItem getRuleSwitchItem(RULE_NAME ruleName) {
 		return openHabEnvironment.getSwitchItem("evcr_charger_" + number + "_" + ruleName.toString() + "_switch");
@@ -475,4 +476,8 @@ public class Charger {
 	protected JRuleStringItem getNameItem() {
 		return openHabEnvironment.getStringItem("evcr_charger_" + number + "_name");
 	}
+	private JRuleNumberItem getConnectedCarItem() {
+		return openHabEnvironment.getNumberItem("evcr_charger_" + number + "_connected_car");
+	}
+	
 }

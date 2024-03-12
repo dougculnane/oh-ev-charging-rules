@@ -25,6 +25,7 @@ public class EVChargingRulesCharger1 extends EVChargingRules {
 	@JRuleName(RULE_NAME_TOGGLE_RULE)
 	@JRuleWhenItemChange(item = "evcr_charger_1_CHEAP_switch")
 	@JRuleWhenItemChange(item = "evcr_charger_1_USE_EXPORT_switch")
+	@JRuleWhenItemChange(item = "evcr_charger_1_BEST_GRID_switch")
 	@JRuleWhenItemChange(item = "evcr_charger_1_TARGET_switch")
 	@JRuleWhenItemChange(item = "evcr_charger_1_TIMER_switch")
 	public void evcr_charger_1_EnableRule(JRuleItemEvent event) {
