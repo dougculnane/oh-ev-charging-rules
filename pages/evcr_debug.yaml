@@ -15,18 +15,6 @@ blocks:
                 slots:
                   default:
                     - component: oh-list-card
-                      config: {}
-                      slots:
-                        default: []
-        - component: oh-grid-row
-          config: {}
-          slots:
-            default:
-              - component: oh-grid-col
-                config: {}
-                slots:
-                  default:
-                    - component: oh-list-card
                       config:
                         accordionList: true
                         mediaList: false
@@ -145,8 +133,7 @@ blocks:
                                           type: text
                           - component: oh-label-item
                             config:
-                              title: ="Best grid rule (" + (items.evcr_charger_1_BEST_GRID_switch.state) +
-                                ")"
+                              title: ="Best grid rule (" + (items.evcr_charger_1_BEST_GRID_switch.state) + ")"
                               icon: material:rule_folder
                             slots:
                               accordion:
@@ -206,10 +193,89 @@ blocks:
                                           sendButton: true
                                           title: Exported power
                                           type: text
-              - component: oh-grid-col
-                config: {}
-                slots:
-                  default: []
+                          - component: oh-label-item
+                            config:
+                              title: ="Target rule (" + (items.evcr_charger_1_TARGET_switch.state) + ")"
+                              icon: material:rule_folder
+                            slots:
+                              accordion:
+                                - component: oh-list-card
+                                  config:
+                                    accordionList: false
+                                    mediaList: false
+                                    simpleList: false
+                                  slots:
+                                    default:
+                                      - component: oh-label-item
+                                        config:
+                                          action: toggle
+                                          actionCommand: ON
+                                          actionCommandAlt: OFF
+                                          actionItem: evcr_charger_1_TARGET_switch
+                                          icon: oh:switch
+                                          iconUseState: true
+                                          item: evcr_charger_1_TARGET_switch
+                                          title: Enable TARGET rule
+                          - component: oh-label-item
+                            config:
+                              title: ="Connected Car (" + (items.evcr_charger_1_connected_car.state) + ")"
+                              icon: material:directions_car
+                            slots:
+                              accordion:
+                                - component: oh-list-card
+                                  config:
+                                    accordionList: false
+                                    mediaList: false
+                                    simpleList: false
+                                  slots:
+                                    default:
+                                      - component: oh-label-item
+                                        config:
+                                          item: ="evcr_charger_" + (items.evcr_charger_1_connected_car.state) +
+                                            "_connected_car"
+                                          title: Connected Car
+                                          action: options
+                                          actionOptions: 1,2
+                                          actionItem: evcr_charger_1_connected_car
+                                          icon: material:directions_car
+                                      - component: oh-input-item
+                                        config:
+                                          inputmode: text
+                                          title: Car name
+                                          item: ="evcr_car_" + (items.evcr_charger_1_connected_car.state) +"_name"
+                                          sendButton: true
+                                          type: text
+                                      - component: oh-slider-item
+                                        config:
+                                          item: ="evcr_car_" + (items.evcr_charger_1_connected_car.state) +
+                                            "_battery_level"
+                                          title: Actual battery level
+                                          icon: oh:batterylevel
+                                          ignoreDisplayState: true
+                                          scale: true
+                                          label: true
+                                          iconUseState: true
+                                          releaseOnly: true
+                                          defaultValue: "0"
+                                      - component: oh-slider-item
+                                        config:
+                                          item: ="evcr_car_" + (items.evcr_charger_1_connected_car.state) +
+                                            "_target_level"
+                                          title: Target battery level
+                                          icon: oh:batterylevel
+                                          ignoreDisplayState: true
+                                          scale: true
+                                          label: true
+                                          iconUseState: true
+                                          releaseOnly: true
+                                          defaultValue: "100"
+                                      - component: oh-input-item
+                                        config:
+                                          inputmode: text
+                                          item: ="evcr_car_" + (items.evcr_charger_1_connected_car.state) +"_target_time"
+                                          sendButton: true
+                                          title: Target Time
+                                          type: text
 masonry: null
 grid: []
 canvas: []

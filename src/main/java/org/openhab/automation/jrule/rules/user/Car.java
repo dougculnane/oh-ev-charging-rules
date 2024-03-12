@@ -28,12 +28,14 @@ public class Car {
 		int target = getTargetLevel();;
 		int level = getBatteryLevel();
 		int batterSizeKW =  getBatterySize();
-		double neededKW = (target-level) / 100 * batterSizeKW;
+		double neededKW = batterSizeKW * (target-level) / 100;
 		Double minutes = neededKW * 60000 / chargeRateWatts;
 		if (target > 90) {
-			minutes = minutes + 60; // add hours for slower charging rate.
+			minutes = minutes + 30; // add hours for slower charging rate.
 		}
-		minutes = minutes + 30; // Add half an hours for losses.
+		if (neededKW > 0) {
+			minutes = minutes + 30; // Add half an hours for losses.
+		}
 		return minutes.intValue();
 	}
 	
@@ -70,8 +72,14 @@ public class Car {
 			String[] value = item.getStateAsString().split(":");
 			if (value.length == 2) {
 				Calendar cal = Calendar.getInstance();
-				cal.set(Calendar.HOUR_OF_DAY, Integer.valueOf(value[0]));
-				cal.set(Calendar.MINUTE, Integer.valueOf(value[1]));
+				int hour = Integer.valueOf(value[0]);
+				int mins = Integer.valueOf(value[1]);
+				if (cal.get(Calendar.HOUR_OF_DAY) > hour 
+						|| (cal.get(Calendar.HOUR_OF_DAY) == hour && cal.get(Calendar.MINUTE) > mins)) {
+					cal.add(Calendar.HOUR_OF_DAY, 24);
+				}
+				cal.set(Calendar.HOUR_OF_DAY, hour);
+				cal.set(Calendar.MINUTE, mins);
 				return cal;
 			}
 		}

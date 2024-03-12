@@ -81,6 +81,9 @@ public class Charger {
         	setActiveRule(RULE_NAME.TARGET);
         	return switchOff();
         }
+		if (getActiveRule() == RULE_NAME.TARGET) {
+			setActiveRule(null);
+		}
 		
 		boolean fastChargingActivated = false;
 		
@@ -130,12 +133,10 @@ public class Charger {
 		
 		// TARGET
 		if (!fastChargingActivated && car != null && isRuleEnabled(RULE_NAME.TARGET)) {
-			
 			int neededMins = car.getMinutesNeededForTarget(240 * this.maxAmps * 3);
 			Calendar now = Calendar.getInstance();
 			Calendar cal = car.getTargetTime();
 			cal.add(Calendar.MINUTE, (neededMins * -1));
-			
 			if (neededMins > 0	&&  cal.before(now)) {
 				setActiveRule(RULE_NAME.TARGET);
 				fastChargingActivated = true;
