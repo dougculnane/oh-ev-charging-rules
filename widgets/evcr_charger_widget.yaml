@@ -1,0 +1,257 @@
+uid: evcr_charger_widget
+tags: []
+props:
+  parameters:
+    - default: "1"
+      description: Charger Number
+      label: Charger Number
+      name: chargerNumber
+      required: true
+      type: TEXT
+  parameterGroups: []
+timestamp: Mar 13, 2024, 8:54:18 PM
+component: f7-card
+config: {}
+slots:
+  default:
+    - component: oh-list-card
+      config:
+        accordionList: true
+        title: = ((items["evcr_charger_"+props.chargerNumber+"_name"]).state)
+      slots:
+        default:
+          - component: f7-row
+            config:
+              style:
+                width: 100%
+            slots:
+              default:
+                - component: f7-col
+                  slots:
+                    default:
+                      - component: f7-segmented
+                        config:
+                          color: gray
+                        slots:
+                          default:
+                            - component: oh-button
+                              config:
+                                text: Off
+                                iconF7: bolt_slash
+                                outline: true
+                                round: true
+                                action: command
+                                actionItem: ="evcr_charger_"+props.chargerNumber+"_mode"
+                                actionCommand: OFF
+                                active: =((items["evcr_charger_"+props.chargerNumber+"_mode"]).state === 'OFF')
+                            - component: oh-button
+                              config:
+                                text: Rules
+                                iconF7: list_dash
+                                outline: true
+                                round: true
+                                action: command
+                                actionItem: ="evcr_charger_"+props.chargerNumber+"_mode"
+                                actionCommand: RULES
+                                active: =((items["evcr_charger_"+props.chargerNumber+"_mode"]).state === 'RULES')
+                            - component: oh-button
+                              config:
+                                text: Fast
+                                iconF7: bolt_fill
+                                outline: true
+                                round: true
+                                action: command
+                                actionItem: ="evcr_charger_"+props.chargerNumber+"_mode"
+                                actionCommand: FAST
+                                active: =((items["evcr_charger_"+props.chargerNumber+"_mode"]).state === 'FAST')
+          - component: oh-label-item
+            config:
+              icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) == "TIMER")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_TIMER_switch"].state) == "ON")?"f7:checkmark_alt_circle":"f7:circle"
+              title: ="Timer rule (" + (items["evcr_charger_"+props.chargerNumber+"_TIMER_start"].state) + " to " + (items["evcr_charger_"+props.chargerNumber+"_TIMER_finish"].state) + ")"
+            slots:
+              accordion:
+                - component: oh-list-card
+                  config:
+                    accordionList: false
+                    mediaList: false
+                    simpleList: false
+                  slots:
+                    default:
+                      - component: oh-label-item
+                        config:
+                          action: toggle
+                          actionCommand: ON
+                          actionCommandAlt: OFF
+                          actionItem: ="evcr_charger_"+props.chargerNumber+"_TIMER_switch"
+                          item: ="evcr_charger_"+props.chargerNumber+"_TIMER_switch"
+                          title: Enable TIMER rule
+                      - component: oh-input-item
+                        config:
+                          inputmode: text
+                          item: ="evcr_charger_"+props.chargerNumber+"_TIMER_start"
+                          sendButton: true
+                          title: Timer start
+                          type: text
+                      - component: oh-input-item
+                        config:
+                          inputmode: text
+                          item: ="evcr_charger_"+props.chargerNumber+"_TIMER_finish"
+                          sendButton: true
+                          title: Timer finish
+                          type: text
+          - component: oh-label-item
+            config:
+              icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) == "CHEAP")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_CHEAP_switch"].state) == "ON")?"f7:checkmark_alt_circle":"f7:circle"
+              title: ="Cheap power rule ( " + (items["evcr_cheap_power_price"].state) + " > " + (items["evcr_grid_power_price"].state) + " ? )"
+            slots:
+              accordion:
+                - component: oh-list-card
+                  config:
+                    accordionList: false
+                    mediaList: false
+                    simpleList: false
+                  slots:
+                    default:
+                      - component: oh-label-item
+                        config:
+                          action: toggle
+                          actionCommand: ON
+                          actionCommandAlt: OFF
+                          actionItem: ="evcr_charger_"+props.chargerNumber+"_CHEAP_switch"
+                          item: ="evcr_charger_"+props.chargerNumber+"_CHEAP_switch"
+                          title: Enable cheap rule
+                      - component: oh-input-item
+                        config:
+                          inputmode: text
+                          item: evcr_cheap_power_price
+                          sendButton: true
+                          title: Cheap power price
+                          type: text
+                      - component: oh-input-item
+                        config:
+                          inputmode: text
+                          item: evcr_grid_power_price
+                          sendButton: true
+                          title: Grid power price
+                          type: text
+          - component: oh-label-item
+            config:
+              icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) == "BEST_GRID")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_BEST_GRID_switch"].state) == "ON")?"f7:checkmark_alt_circle":"f7:circle"
+              title: ="Best grid rule (" + (items["evcr_charger_"+props.chargerNumber+"_BEST_GRID_start"].displayState) + " - "+ (items["evcr_charger_"+props.chargerNumber+"_BEST_GRID_finish"].displayState) +")"
+            slots:
+              accordion:
+                - component: oh-list-card
+                  config:
+                    accordionList: false
+                    mediaList: false
+                    simpleList: false
+                  slots:
+                    default:
+                      - component: oh-label-item
+                        config:
+                          action: toggle
+                          actionCommand: ON
+                          actionCommandAlt: OFF
+                          actionItem: ="evcr_charger_"+props.chargerNumber+"_BEST_GRID_switch"
+                          item: ="evcr_charger_"+props.chargerNumber+"_BEST_GRID_switch"
+                          title: Enable best grid rule
+                      - component: oh-label-item
+                        config:
+                          item: ="evcr_charger_"+props.chargerNumber+"_BEST_GRID_start"
+                          title: Best grid start
+                      - component: oh-label-item
+                        config:
+                          item: ="evcr_charger_"+props.chargerNumber+"_BEST_GRID_finish"
+                          title: Best grid finish
+          - component: oh-label-item
+            config:
+              icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) == "USE_EXPORT")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_USE_EXPORT_switch"].state) == "ON")?"f7:checkmark_alt_circle":"f7:circle"
+              title: ="Use exported power rule (" + (items.evcr_export_power.state) + " W)"
+            slots:
+              accordion:
+                - component: oh-list-card
+                  config:
+                    accordionList: false
+                    mediaList: false
+                    simpleList: false
+                  slots:
+                    default:
+                      - component: oh-label-item
+                        config:
+                          action: toggle
+                          actionCommand: ON
+                          actionCommandAlt: OFF
+                          actionItem: ="evcr_charger_"+props.chargerNumber+"_USE_EXPORT_switch"
+                          item: ="evcr_charger_"+props.chargerNumber+"_USE_EXPORT_switch"
+                          title: Enable use export rule
+                      - component: oh-input-item
+                        config:
+                          inputmode: text
+                          item: evcr_export_power
+                          sendButton: true
+                          title: Exported power
+                          type: text
+          - component: oh-label-item
+            config:
+              icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) == "TARGET")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_TARGET_switch"].state) == "ON")?"f7:checkmark_alt_circle":"f7:circle"
+              title: ="Target rule (" + (items.evcr_charger_1_TARGET_switch.state) + ")"
+            slots:
+              accordion:
+                - component: oh-list-card
+                  config:
+                    accordionList: false
+                    mediaList: false
+                    simpleList: false
+                  slots:
+                    default:
+                      - component: oh-label-item
+                        config:
+                          action: toggle
+                          actionCommand: ON
+                          actionCommandAlt: OFF
+                          actionItem: evcr_charger_1_TARGET_switch
+                          item: evcr_charger_1_TARGET_switch
+                          title: Enable target rule
+          - component: f7-row
+            config:
+              style:
+                width: 100%
+            slots:
+              default:
+                - component: f7-col
+                  slots:
+                    default:
+                      - component: f7-segmented
+                        config:
+                          color: gray
+                        slots:
+                          default:
+                            - component: oh-button
+                              config:
+                                text: =(items["evcr_charger_"+props.chargerNumber+"_switch"]).state
+                                iconF7: power
+                                outline: true
+                                round: true
+                                large: true
+                                active: =((items["evcr_charger_"+props.chargerNumber+"_switch"]).state === 'ON')
+                            - component: oh-button
+                              config:
+                                text: =(items["evcr_charger_"+props.chargerNumber+"_power"]).state+" kW"
+                                iconF7: bolt_fill
+                                outline: true
+                                large: true
+                                round: true
+                            - component: oh-button
+                              config:
+                                text: =(items["evcr_charger_"+props.chargerNumber+"_phases"]).state+" Phases"
+                                iconF7: bolt_horizontal_fill
+                                outline: true
+                                large: true
+                            - component: oh-button
+                              config:
+                                text: =(items["evcr_charger_"+props.chargerNumber+"_amps"]).state+" Amps"
+                                iconF7: dot_square
+                                outline: true
+                                large: true
+                                round: true
+

@@ -74,7 +74,7 @@ public class Charger {
 	
 	public boolean handlePolling() {
 		if (getMode() != MODE_VALUE.RULES) {
-			return false;
+			return handleMode(getMode().toString());
 		}
 		final Car car = getConnectedCar();
 		if (car != null && car.targetLevelReached() ) {
@@ -132,7 +132,10 @@ public class Charger {
 		}
 		
 		// TARGET
-		if (!fastChargingActivated && car != null && isRuleEnabled(RULE_NAME.TARGET)) {
+		if (!fastChargingActivated 
+				&& car != null 
+				&& isRuleEnabled(RULE_NAME.TARGET)
+				&& car.getTargetTime() != null) {
 			int neededMins = car.getMinutesNeededForTarget(240 * this.maxAmps * 3);
 			Calendar now = Calendar.getInstance();
 			Calendar cal = car.getTargetTime();
