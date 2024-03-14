@@ -9,7 +9,7 @@ props:
       required: true
       type: TEXT
   parameterGroups: []
-timestamp: Mar 13, 2024, 8:54:18 PM
+timestamp: Mar 14, 2024, 6:54:40 PM
 component: f7-card
 config: {}
 slots:
@@ -17,7 +17,7 @@ slots:
     - component: oh-list-card
       config:
         accordionList: true
-        title: = ((items["evcr_charger_"+props.chargerNumber+"_name"]).state)
+        title: = ((items["evcr_charger_"+props.chargerNumber+"_name"]).state) === "NULL" ? "Charger " + props.chargerNumber:((items["evcr_charger_"+props.chargerNumber+"_name"]).state)
       slots:
         default:
           - component: f7-row
@@ -64,10 +64,10 @@ slots:
                                 actionItem: ="evcr_charger_"+props.chargerNumber+"_mode"
                                 actionCommand: FAST
                                 active: =((items["evcr_charger_"+props.chargerNumber+"_mode"]).state === 'FAST')
-          - component: oh-label-item
+          - component: oh-list-item
             config:
               icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) == "TIMER")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_TIMER_switch"].state) == "ON")?"f7:checkmark_alt_circle":"f7:circle"
-              title: ="Timer rule (" + (items["evcr_charger_"+props.chargerNumber+"_TIMER_start"].state) + " to " + (items["evcr_charger_"+props.chargerNumber+"_TIMER_finish"].state) + ")"
+              title: ="Timer rule"+(((items["evcr_charger_"+props.chargerNumber+"_TIMER_switch"].state) == "ON")? " (" + (items["evcr_charger_"+props.chargerNumber+"_TIMER_start"].state) + " to " + (items["evcr_charger_"+props.chargerNumber+"_TIMER_finish"].state) + ")":"")
             slots:
               accordion:
                 - component: oh-list-card
@@ -90,19 +90,19 @@ slots:
                           inputmode: text
                           item: ="evcr_charger_"+props.chargerNumber+"_TIMER_start"
                           sendButton: true
-                          title: Timer start
+                          title: Timer start (HH:mm)
                           type: text
                       - component: oh-input-item
                         config:
                           inputmode: text
                           item: ="evcr_charger_"+props.chargerNumber+"_TIMER_finish"
                           sendButton: true
-                          title: Timer finish
+                          title: Timer finish (HH:mm)
                           type: text
-          - component: oh-label-item
+          - component: oh-list-item
             config:
               icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) == "CHEAP")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_CHEAP_switch"].state) == "ON")?"f7:checkmark_alt_circle":"f7:circle"
-              title: ="Cheap power rule ( " + (items["evcr_cheap_power_price"].state) + " > " + (items["evcr_grid_power_price"].state) + " ? )"
+              title: ="Cheap power rule"+(((items["evcr_charger_"+props.chargerNumber+"_CHEAP_switch"].state) == "ON")? " (" + (items["evcr_cheap_power_price"].state) + " > " + (items["evcr_grid_power_price"].state) + " ? )":"")
             slots:
               accordion:
                 - component: oh-list-card
@@ -120,6 +120,10 @@ slots:
                           actionItem: ="evcr_charger_"+props.chargerNumber+"_CHEAP_switch"
                           item: ="evcr_charger_"+props.chargerNumber+"_CHEAP_switch"
                           title: Enable cheap rule
+                      - component: oh-label-item
+                        config:
+                          item: evcr_grid_power_price
+                          title: Grid power price
                       - component: oh-input-item
                         config:
                           inputmode: text
@@ -127,17 +131,10 @@ slots:
                           sendButton: true
                           title: Cheap power price
                           type: text
-                      - component: oh-input-item
-                        config:
-                          inputmode: text
-                          item: evcr_grid_power_price
-                          sendButton: true
-                          title: Grid power price
-                          type: text
-          - component: oh-label-item
+          - component: oh-list-item
             config:
               icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) == "BEST_GRID")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_BEST_GRID_switch"].state) == "ON")?"f7:checkmark_alt_circle":"f7:circle"
-              title: ="Best grid rule (" + (items["evcr_charger_"+props.chargerNumber+"_BEST_GRID_start"].displayState) + " - "+ (items["evcr_charger_"+props.chargerNumber+"_BEST_GRID_finish"].displayState) +")"
+              title: ="Best grid rule"+(((items["evcr_charger_"+props.chargerNumber+"_BEST_GRID_switch"].state) == "ON")? " (" + (items["evcr_charger_"+props.chargerNumber+"_BEST_GRID_start"].displayState) + " - "+ (items["evcr_charger_"+props.chargerNumber+"_BEST_GRID_finish"].displayState) +")":"")
             slots:
               accordion:
                 - component: oh-list-card
@@ -163,10 +160,10 @@ slots:
                         config:
                           item: ="evcr_charger_"+props.chargerNumber+"_BEST_GRID_finish"
                           title: Best grid finish
-          - component: oh-label-item
+          - component: oh-list-item
             config:
               icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) == "USE_EXPORT")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_USE_EXPORT_switch"].state) == "ON")?"f7:checkmark_alt_circle":"f7:circle"
-              title: ="Use exported power rule (" + (items.evcr_export_power.state) + " W)"
+              title: ="Use exported power rule"+(((items["evcr_charger_"+props.chargerNumber+"_USE_EXPORT_switch"].state) == "ON")? " (" + (items.evcr_export_power.state) + " W)":"")
             slots:
               accordion:
                 - component: oh-list-card
@@ -184,17 +181,14 @@ slots:
                           actionItem: ="evcr_charger_"+props.chargerNumber+"_USE_EXPORT_switch"
                           item: ="evcr_charger_"+props.chargerNumber+"_USE_EXPORT_switch"
                           title: Enable use export rule
-                      - component: oh-input-item
+                      - component: oh-label-item
                         config:
-                          inputmode: text
                           item: evcr_export_power
-                          sendButton: true
                           title: Exported power
-                          type: text
-          - component: oh-label-item
+          - component: oh-list-item
             config:
               icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) == "TARGET")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_TARGET_switch"].state) == "ON")?"f7:checkmark_alt_circle":"f7:circle"
-              title: ="Target rule (" + (items.evcr_charger_1_TARGET_switch.state) + ")"
+              title: ="Target rule (" +  (items["evcr_car_"+ (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) +"_target_level"]).state  + "%"+(((items["evcr_charger_"+props.chargerNumber+"_TARGET_switch"].state) == "ON")? " @ " + (items["evcr_car_"+ (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) +"_target_time"]).state:"")+ ")"
             slots:
               accordion:
                 - component: oh-list-card
@@ -209,8 +203,8 @@ slots:
                           action: toggle
                           actionCommand: ON
                           actionCommandAlt: OFF
-                          actionItem: evcr_charger_1_TARGET_switch
-                          item: evcr_charger_1_TARGET_switch
+                          actionItem: ="evcr_charger_"+props.chargerNumber+"_TARGET_switch"
+                          item: ="evcr_charger_"+props.chargerNumber+"_TARGET_switch"
                           title: Enable target rule
           - component: f7-row
             config:
@@ -247,6 +241,7 @@ slots:
                                 iconF7: bolt_horizontal_fill
                                 outline: true
                                 large: true
+                                round: true
                             - component: oh-button
                               config:
                                 text: =(items["evcr_charger_"+props.chargerNumber+"_amps"]).state+" Amps"
@@ -254,4 +249,52 @@ slots:
                                 outline: true
                                 large: true
                                 round: true
+          - component: oh-list-item
+            config:
+              icon: oh:batterylevel
+              iconUseState: true
+              item: ="evcr_car_"+  (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) +"_battery_level"
+              title: =((items["evcr_car_"+ (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) +"_name"]).state === "NULL"?"Car "+(items["evcr_charger_"+props.chargerNumber+"_connected_car"].state):(items["evcr_car_"+ (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) +"_name"]).state )+ " - " +  (items["evcr_car_"+ (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) +"_battery_level"]).state  + "%"
+            slots:
+              accordion:
+                - component: oh-list-card
+                  config:
+                    accordionList: false
+                    mediaList: false
+                    simpleList: false
+                  slots:
+                    default:
+                      - component: oh-label-item
+                        config:
+                          action: options
+                          actionItem: ="evcr_charger_"+props.chargerNumber+"_connected_car"
+                          actionOptions: 1,2
+                          icon: material:directions_car
+                          item: ="evcr_charger_"+props.chargerNumber+"_connected_car"
+                          title: Connected Car
+                      - component: oh-input-item
+                        config:
+                          inputmode: text
+                          item: ="evcr_car_"+ (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) +"_name"
+                          sendButton: true
+                          title: Car name
+                          type: text
+                      - component: oh-slider-item
+                        config:
+                          defaultValue: "100"
+                          icon: oh:batterylevel
+                          iconUseState: true
+                          ignoreDisplayState: true
+                          item: ="evcr_car_" +  (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) + "_target_level"
+                          label: true
+                          releaseOnly: true
+                          scale: true
+                          title: Target battery level
+                      - component: oh-input-item
+                        config:
+                          inputmode: text
+                          item: ="evcr_car_" +  (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) +"_target_time"
+                          sendButton: true
+                          title: Target Time (HH:mm)
+                          type: text
 

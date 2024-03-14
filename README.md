@@ -1,6 +1,12 @@
 # oh-ev-charging-rules
 
-openHAB EV Charging Rules are complex rules that optimaise electric vehicle charging. Using openHAB items for interation with physical devices, via openHAB bindings, jRules handle the complexity of smart charging control.
+openHAB EV Charging Rules are complex rules that optimise electric vehicle charging. Using openHAB items for interaction with physical devices, via openHAB bindings, jRules handle the complexity of smart charging control. A UI Widget handles user interaction.
+
+![Page](/docs/Page.png)
+
+Rules can be enabled and configured.  Individual cars can have charging target/limits set.
+
+![Page](/docs/PageWithSettings.png)
 
 ## Prerequisites
 
@@ -17,6 +23,7 @@ openHAB EV Charging Rules are complex rules that optimaise electric vehicle char
 ## Installation.
 
 * Add openHAB items from files in items/
+* Add openHAB widget from files in widgets/
 * Add openHAB pages from files in pages/
 * Link evcr items to openHAB thing channels.
 * Copy rules jar to jrules-jar folder.
