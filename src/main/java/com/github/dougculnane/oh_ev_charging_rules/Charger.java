@@ -1,4 +1,4 @@
-package org.openhab.automation.jrule.rules.user;
+package com.github.dougculnane.oh_ev_charging_rules;
 
 import java.time.ZonedDateTime;
 import java.util.Calendar;
@@ -8,6 +8,7 @@ import org.openhab.automation.jrule.items.JRuleDateTimeItem;
 import org.openhab.automation.jrule.items.JRuleNumberItem;
 import org.openhab.automation.jrule.items.JRuleStringItem;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
+import org.openhab.automation.jrule.rules.user.OpenHabEnvironment;
 import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
 import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
 import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;

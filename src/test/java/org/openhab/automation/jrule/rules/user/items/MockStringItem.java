@@ -1,6 +1,5 @@
 package org.openhab.automation.jrule.rules.user.items;
 
-import org.openhab.automation.jrule.internal.handler.JRuleEventHandler;
 import org.openhab.automation.jrule.items.JRuleStringItem;
 import org.openhab.automation.jrule.rules.value.JRuleStringValue;
 import org.openhab.automation.jrule.rules.value.JRuleValue;

@@ -1,4 +1,4 @@
-package org.openhab.automation.jrule.rules.user;
+package com.github.dougculnane.oh_ev_charging_rules;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,8 +14,11 @@ import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.rules.user.items.MockJRuleNumberItem;
 import org.openhab.automation.jrule.rules.user.items.MockStringItem;
 import org.openhab.automation.jrule.rules.user.items.MockSwitchItem;
-import org.openhab.automation.jrule.rules.user.Charger.MODE_VALUE;
-import org.openhab.automation.jrule.rules.user.Charger.RULE_NAME;
+
+import com.github.dougculnane.oh_ev_charging_rules.Charger.MODE_VALUE;
+import com.github.dougculnane.oh_ev_charging_rules.Charger.RULE_NAME;
+
+import org.openhab.automation.jrule.rules.user.OpenHabEnvironment;
 
 @RunWith(MockitoJUnitRunner.class)
 class TestCharger {

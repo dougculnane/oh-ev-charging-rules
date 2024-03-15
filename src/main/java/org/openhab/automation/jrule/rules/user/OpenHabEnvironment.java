@@ -9,7 +9,7 @@ import org.openhab.automation.jrule.items.JRuleSwitchItem;
 
 public class OpenHabEnvironment {
 	
-	protected JRuleSwitchItem getSwitchItem(String name) {
+	public JRuleSwitchItem getSwitchItem(String name) {
 		Optional<JRuleSwitchItem> itemOption = JRuleSwitchItem.forNameOptional(name);
 		if (itemOption.isPresent()) {
 			return itemOption.get();

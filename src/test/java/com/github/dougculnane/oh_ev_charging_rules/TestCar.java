@@ -1,4 +1,4 @@
-package org.openhab.automation.jrule.rules.user;
+package com.github.dougculnane.oh_ev_charging_rules;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.openhab.automation.jrule.items.JRuleNumberItem;
 import org.openhab.automation.jrule.items.JRuleStringItem;
+import org.openhab.automation.jrule.rules.user.OpenHabEnvironment;
 import org.openhab.automation.jrule.rules.user.items.MockJRuleNumberItem;
 import org.openhab.automation.jrule.rules.user.items.MockStringItem;
 
@@ -42,7 +43,6 @@ public class TestCar {
 		Mockito.when(mock.getStringItem(name.getName())).thenReturn(name);
 		Mockito.when(mock.getNumberItem(target.getName())).thenReturn(target);
 		Mockito.when(mock.getNumberItem(battery.getName())).thenReturn(battery);
-		
 		return new Car(mock, number);
 	}
 	

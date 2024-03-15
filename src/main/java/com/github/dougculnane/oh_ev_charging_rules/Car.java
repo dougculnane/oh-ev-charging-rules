@@ -1,9 +1,10 @@
-package org.openhab.automation.jrule.rules.user;
+package com.github.dougculnane.oh_ev_charging_rules;
 
 import java.util.Calendar;
 
 import org.openhab.automation.jrule.items.JRuleNumberItem;
 import org.openhab.automation.jrule.items.JRuleStringItem;
+import org.openhab.automation.jrule.rules.user.OpenHabEnvironment;
 
 public class Car {
 
