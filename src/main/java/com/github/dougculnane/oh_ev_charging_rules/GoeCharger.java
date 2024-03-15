@@ -14,10 +14,6 @@ public class GoeCharger extends Charger {
 		super(openHabEnvironment, number);
 	}
 
-	boolean switchOn(int phases, int amps) {
-		return setPower(phases, amps) | switchOn();
-	}
-
 	@Override
 	protected boolean activateFastCharging() {
 		return switchOn(3, MAX_AMPS);
@@ -26,18 +22,6 @@ public class GoeCharger extends Charger {
 	@Override
 	protected double getFastChargeRate() {
 		return 240 * MAX_AMPS * 3;
-	}
-
-	protected boolean setPower(int phases, int amps) {
-		boolean changes = setPhases(phases);
-		if (amps < getMinAmps(phases)) {
-			amps = getMinAmps(phases);
-		}
-		if (amps > MAX_AMPS) {
-			amps = MAX_AMPS;
-		}
-		setAmps(amps);
-		return changes;
 	}
 
 	@Override
@@ -56,6 +40,22 @@ public class GoeCharger extends Charger {
 	@Override
 	protected double getMinimPower() {
 		return getMinimPhase1Power();
+	}
+	
+	private boolean switchOn(int phases, int amps) {
+		return setPower(phases, amps) | switchOn();
+	}
+	
+	private boolean setPower(int phases, int amps) {
+		boolean changes = setPhases(phases);
+		if (amps < getMinAmps(phases)) {
+			amps = getMinAmps(phases);
+		}
+		if (amps > MAX_AMPS) {
+			amps = MAX_AMPS;
+		}
+		setAmps(amps);
+		return changes;
 	}
 	
 	private Double getMinimPhase1Power() {

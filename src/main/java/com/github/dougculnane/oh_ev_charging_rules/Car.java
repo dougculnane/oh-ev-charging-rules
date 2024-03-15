@@ -44,9 +44,11 @@ public class Car {
 		return getBatteryLevel() >= getTargetLevel();
 	}
 	
-	
 	private int getBatterySize() {
-		// TODO Auto-generated method stub
+		JRuleNumberItem item = getBatterySizelItem();
+		if (item != null && item.getState() != null) {
+			return item.getStateAsDecimal().intValue();
+		}
 		return 50;
 	}
 	
@@ -89,6 +91,9 @@ public class Car {
 	
 	protected JRuleNumberItem getBatteryLevelItem() {
 		return openHabEnvironment.getNumberItem("evcr_car_" + number + "_battery_level");
+	}
+	protected JRuleNumberItem getBatterySizelItem() {
+		return openHabEnvironment.getNumberItem("evcr_car_" + number + "_battery_size");
 	}
 	protected JRuleNumberItem getTargetLevelItem() {
 		return openHabEnvironment.getNumberItem("evcr_car_" + number + "_target_level");

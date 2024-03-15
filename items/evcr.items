@@ -28,12 +28,14 @@ DateTime	evcr_charger_1_timer_finish		"Charge finish"						(gEVCR)
 
 // Car 1
 String 	evcr_car_1_name				"Car"						(gEVCR)
-String 	evcr_car_1_target_time		"Target Time"	<time>		(gEVCR)
+Number  evcr_car_1_battery_size     "Battery Size (kWh)"		(gEVCR)
 Number 	evcr_car_1_battery_level	"Battery Level"	<battery>	(gEVCR)
 Number 	evcr_car_1_target_level		"Target Level"	<battery>	(gEVCR)
+String 	evcr_car_1_target_time		"Target Time"	<time>		(gEVCR)
 
 // Car 2
 String 	evcr_car_2_name				"Car"						(gEVCR)
-String 	evcr_car_2_target_time		"Target Time"	<time>		(gEVCR)
+Number  evcr_car_2_battery_size     "Battery Size (kWh)"		(gEVCR)
 Number 	evcr_car_2_battery_level	"Battery Level"	<battery>	(gEVCR)
 Number 	evcr_car_2_target_level		"Target Level"	<battery>	(gEVCR)
+String 	evcr_car_2_target_time		"Target Time"	<time>		(gEVCR)
