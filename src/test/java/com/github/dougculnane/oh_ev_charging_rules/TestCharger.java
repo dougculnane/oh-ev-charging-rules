@@ -66,10 +66,10 @@ class TestCharger {
 		assertOffMode(charger1);
 		charger1.handlePolling();
 		charger1.handleMode("RULES");
-		sendPVData(charger1, 100, false, 1, 8);
-		sendPVData(charger1, 1000, false, 1, 8);
-		sendPVData(charger1, 1500, false, 1, 8);
-		sendPVData(charger1, 1800, false, 1, 8);
+		sendPVData(charger1, 100, false, 3, 16);
+		sendPVData(charger1, 1000, false, 3, 16);
+		sendPVData(charger1, 1500, true, 1, 6);
+		sendPVData(charger1, 1800, true, 1, 7);
 		sendPVData(charger1, 2000, true, 1 , 8);
 		sendPVData(charger1, 2200, true, 1 , 9);
 		sendPVData(charger1, 2400, true, 1 , 10);
@@ -110,7 +110,7 @@ class TestCharger {
 		sendPVData(charger1, 7500, true, 3 , 10);
 		sendPVData(charger1, 7000, true, 3 , 9);
 		sendPVData(charger1, 6000, true, 3 , 8);
-		sendPVData(charger1, 5500, true, 1 , 8);
+		sendPVData(charger1, 5500, true, 1 , 16);
 		sendPVData(charger1, 5000, true, 1 , 16);
 		sendPVData(charger1, 4500, true, 1 , 16);
 		sendPVData(charger1, 4000, true, 1 , 16);
@@ -125,10 +125,10 @@ class TestCharger {
 		sendPVData(charger1, 2400, true, 1 , 10);
 		sendPVData(charger1, 2200, true, 1 , 9);
 		sendPVData(charger1, 2000, true, 1 , 8);
-		sendPVData(charger1, 1800, false, 1, 8);
-		sendPVData(charger1, 1500, false, 1, 8);
-		sendPVData(charger1, 1000, false, 1, 8);	
-		sendPVData(charger1, 100, false, 1, 8);
+		sendPVData(charger1, 1800, true, 1, 7);
+		sendPVData(charger1, 1500, true, 1, 6);
+		sendPVData(charger1, 1000, false, 1, 6);	
+		sendPVData(charger1, 100, false, 1, 6);
 		
 		
 		charger1.disableRule(RULE_NAME.USE_EXPORT.toString());
@@ -145,8 +145,12 @@ class TestCharger {
 		assertOffMode(charger1);
 		charger1.handlePolling();
 		charger1.handleMode("RULES");
-		sendPVData(charger1, 1500, false, 1 , 8);  // switching phases so still off.
-		sendPVData(charger1, 1500, false, 1, 8);
+		charger1.handlePolling();
+		sendPVData(charger1, 1000, false, 3, 16);
+		sendPVData(charger1, 1440, false, 3, 16); // still of switching phases.
+		sendPVData(charger1, 1500, true, 1, 6);
+		sendPVData(charger1, 1700, true, 1, 7);  
+		sendPVData(charger1, 1950, true, 1, 8);
 		sendPVData(charger1, 3200, true, 1 , 13);
 		sendPVData(charger1, 4500, true, 1 , 16);  
 		sendPVData(charger1, 4500, true, 1 , 16);
@@ -154,7 +158,7 @@ class TestCharger {
 		sendPVData(charger1, 5500, true, 1 , 16);
 		sendPVData(charger1, 6000, true, 3 , 8);
 		sendPVData(charger1, 6500, true, 3 , 9);
-		sendPVData(charger1, 5500, true, 1 , 9);
+		sendPVData(charger1, 5500, true, 1 , 16);
 		sendPVData(charger1, 5800, true, 3 , 8);
 	    // TODO deal with flutter between phases.
 	}
@@ -182,11 +186,11 @@ class TestCharger {
 		assertOff(charger1);
 		
 		//do a bit of solar then stop
-		sendPVData(charger1, 1500, false, 1 , 8);  // switching phases so still off.
-		sendPVData(charger1, 1500, false, 1, 8);
-		sendPVData(charger1, 4500, true, 1 , 16);
+		sendPVData(charger1, 1500, true, 1, 6); 
+		sendPVData(charger1, 1500, true, 1, 6);
+		sendPVData(charger1, 4500, true, 1, 16);
 		sendPVData(charger1, 2400, true, 1, 10);
-		sendPVData(charger1, 500, false, 1 , 8);
+		sendPVData(charger1, 500, false, 1, 10);
 		assertNull(charger1.getActiveRule());
 		
 		assertOff(charger1);
@@ -206,8 +210,9 @@ class TestCharger {
 		assertOff(charger1);
 		
 		//do a bit of solar then stop
-		sendPVData(charger1, 1500, false, 1 , 8);  // switching phases so still off.
-		sendPVData(charger1, 1500, false, 1, 8);
+		sendPVData(charger1, 1000, false, 3, 16);
+		sendPVData(charger1, 1500, true, 1, 6);
+		sendPVData(charger1, 1700, true, 1, 7);
 		sendPVData(charger1, 4500, true, 1, 16);
 		sendPVData(charger1, 2400, true, 1, 10);
 		sendPVData(charger1, 5000, true, 1, 16);
@@ -309,7 +314,7 @@ class TestCharger {
 		Mockito.when(mock.getSwitchItem(rule_BEST_PRICE_switch.getName())).thenReturn(rule_BEST_PRICE_switch);
 		Mockito.when(mock.getStringItem(evcr_charger_TIMER_start.getName())).thenReturn(evcr_charger_TIMER_start);
 		Mockito.when(mock.getStringItem(evcr_charger_TIMER_finish.getName())).thenReturn(evcr_charger_TIMER_finish);
-		return new Charger(mock, number);
+		return new GoeCharger(mock, number);
 	}
 	
 	private void sendPVData(Charger charger, double gridPower, boolean isOn, int phases, int  amps) {
@@ -334,7 +339,7 @@ class TestCharger {
 		assertTrue(charger.isOn());
 		assertFalse(charger.isOff());
 		assertEquals("evcr_charger_" + charger.number, charger.getName());
-		assertEquals(charger.maxAmps, charger.getAmps());
+		assertEquals(16, charger.getAmps());
 		assertEquals(3, charger.getPhases());
 	}
 	

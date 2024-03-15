@@ -10,6 +10,7 @@ import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
 import org.openhab.automation.jrule.rules.event.JRuleTimerEvent;
 
 import com.github.dougculnane.oh_ev_charging_rules.Charger;
+import com.github.dougculnane.oh_ev_charging_rules.GoeCharger;
 
 public class EVChargingRules extends JRule {
  
@@ -20,8 +21,8 @@ public class EVChargingRules extends JRule {
 	static final String RULE_NAME_EXPORT_POWER = "evcr_export_power";
 	static final String CHARGER_POLLING_RULE_NAME = "evcr_charger_polling";
 	
-	protected static Charger charger1 = new Charger(1);
-	protected static Charger charger2 = new Charger(2);
+	protected static Charger charger1 = new GoeCharger(1);
+	protected static Charger charger2 = new GoeCharger(2);
 	
 	@JRuleName(RULE_NAME_EXPORT_POWER)
 	@JRuleWhenItemChange(item = "evcr_export_power")
