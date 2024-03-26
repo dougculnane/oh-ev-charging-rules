@@ -3,6 +3,7 @@ String 	evcr_charger_2_name					"Charger"							(gEVCR)
 String 	evcr_charger_2_mode 				"Charging Mode"						(gEVCR) {stateDescription="[options=OFF, FAST, RULES]"}
 String  evcr_charger_2_active_rule			"Active rule"   					(gEVCR)
 Switch  evcr_charger_2_switch				"Charging Switch"					(gEVCR)
+Number	evcr_charger_2_state				"Force state"						(gEVCR)
 Number	evcr_charger_2_amps					"Amps"								(gEVCR)
 Number	evcr_charger_2_phases 				"Phases"							(gEVCR)
 Number	evcr_charger_2_power 				"Charge Power"	 		<energy>	(gEVCR)

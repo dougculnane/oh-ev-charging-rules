@@ -314,7 +314,7 @@ class TestCharger {
 		Mockito.when(mock.getSwitchItem(rule_BEST_PRICE_switch.getName())).thenReturn(rule_BEST_PRICE_switch);
 		Mockito.when(mock.getStringItem(evcr_charger_TIMER_start.getName())).thenReturn(evcr_charger_TIMER_start);
 		Mockito.when(mock.getStringItem(evcr_charger_TIMER_finish.getName())).thenReturn(evcr_charger_TIMER_finish);
-		return new GoeCharger(mock, number);
+		return new GoeCharger_API1(mock, number);
 	}
 	
 	private void sendPVData(Charger charger, double gridPower, boolean isOn, int phases, int  amps) {

@@ -2,15 +2,21 @@ package com.github.dougculnane.oh_ev_charging_rules;
 
 import org.openhab.automation.jrule.rules.user.OpenHabEnvironment;
 
-public class GoeCharger extends Charger {
+/**
+ * Uses the Go-eCharger Binding: https://www.openhab.org/addons/bindings/goecharger/ 
+ * API version 1
+ * 
+ * This is not tested.
+ */
+public class GoeCharger_API1 extends Charger {
 
 	private static final int MAX_AMPS = 16;
 	
-	public GoeCharger(int number) {
+	public GoeCharger_API1(int number) {
 		super(number);
 	}
 	
-	public GoeCharger(OpenHabEnvironment openHabEnvironment, int number) {
+	public GoeCharger_API1(OpenHabEnvironment openHabEnvironment, int number) {
 		super(openHabEnvironment, number);
 	}
 
@@ -47,7 +53,6 @@ public class GoeCharger extends Charger {
 	}
 	
 	private boolean setPower(int phases, int amps) {
-		boolean changes = setPhases(phases);
 		if (amps < getMinAmps(phases)) {
 			amps = getMinAmps(phases);
 		}
@@ -55,7 +60,7 @@ public class GoeCharger extends Charger {
 			amps = MAX_AMPS;
 		}
 		setAmps(amps);
-		return changes;
+		return setPhases(phases);
 	}
 	
 	private Double getMinimPhase1Power() {
@@ -65,6 +70,12 @@ public class GoeCharger extends Charger {
 		return Double.valueOf((240 * getMinAmps(3) * 3));
 	}
 	
+	/**
+	 * My Charger can not do 6 amps on 3 phases.
+	 * 
+	 * @param phases
+	 * @return
+	 */
 	private int getMinAmps(int phases) {
 		if (phases == 1) {
 			return 6;

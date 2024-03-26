@@ -8,6 +8,7 @@ import org.openhab.automation.jrule.items.JRuleDateTimeItem;
 import org.openhab.automation.jrule.items.JRuleNumberItem;
 import org.openhab.automation.jrule.items.JRuleStringItem;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
+import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.user.OpenHabEnvironment;
 import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
 import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
@@ -15,7 +16,7 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 
 public abstract class Charger {
 
-	final private OpenHabEnvironment openHabEnvironment;
+	final protected OpenHabEnvironment openHabEnvironment;
 	
 	enum MODE_VALUE {
 		OFF, FAST, RULES
@@ -186,7 +187,8 @@ public abstract class Charger {
 	
 	protected boolean setAmps(int amps) {
 		JRuleNumberItem ampsItem = getAmpsItem();
-		if (ampsItem != null && (ampsItem.getStateAsDecimal() == null || ampsItem.getStateAsDecimal().intValue() != amps)) {
+		if (ampsItem != null 
+				&& (ampsItem.getState() == null || ampsItem.getStateAsDecimal() == null || ampsItem.getStateAsDecimal().intValue() != amps)) {
 			ampsItem.sendCommand(new JRuleDecimalValue(amps));
 			return true;
 		}
@@ -390,7 +392,9 @@ public abstract class Charger {
 	
 	protected boolean setPhases(int phases) {
 		JRuleNumberItem phasesItem = getPhasesItem();
-		if (phasesItem != null && (phasesItem.getState() == null || phasesItem.getStateAsDecimal().intValue() != phases)) {
+		if ((phases == 1 || phases == 3)
+			&& phasesItem != null 
+			&& (phasesItem.getState() == null || phasesItem.getStateAsDecimal().intValue() != phases)) {
 			phasesItem.sendCommand(new JRuleDecimalValue(phases));
 			return true;
 		}
@@ -424,7 +428,7 @@ public abstract class Charger {
 	protected JRuleNumberItem getAmpsItem() {
 		return openHabEnvironment.getNumberItem("evcr_charger_" + number + "_amps");
 	}
-	private JRuleNumberItem getPhasesItem() {
+	protected JRuleNumberItem getPhasesItem() {
 		return openHabEnvironment.getNumberItem("evcr_charger_" + number + "_phases");
 	}
 	protected JRuleNumberItem getExportPowerItem() {
