@@ -1,7 +1,9 @@
 package com.github.dougculnane.oh_ev_charging_rules;
 
 import org.openhab.automation.jrule.items.JRuleNumberItem;
+import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.rules.user.OpenHabEnvironment;
+import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 
 /**
  * Uses the Go-eCharger Binding: https://www.openhab.org/addons/bindings/goecharger/ 
@@ -32,8 +34,8 @@ public class GoeCharger_API2 extends Charger {
 	@Override
 	boolean switchOn(double watts) {
 		if (watts > getMinimPhase3Power()) {
-			int calcAmps = Double.valueOf(watts / 240 / 3).intValue();;
-			return switchOn(3, calcAmps);
+				int calcAmps = Double.valueOf(watts / 240 / 3).intValue();;
+				return switchOn(3, calcAmps);
 		} else if (watts > getMinimPhase1Power()) {
 			int calcAmps = Double.valueOf(watts / 240).intValue();
 			return switchOn(1, calcAmps);
@@ -51,8 +53,10 @@ public class GoeCharger_API2 extends Charger {
 	protected boolean switchOn() {
 		// In API version 2 the switch is read only
 		// set force state to neutral (Neutral=0, Off=1, On=2)
+		super.switchOn();
 		JRuleNumberItem item = getForceStateItem();
-		if (item != null && (item.getState() == null || item.getStateAsDecimal().intValue() != 0)) {
+		if (item != null 
+				&& (item.getState() == null	|| ((item.getStateAsDecimal().intValue() != 0 && item.getStateAsDecimal().intValue() != 2) ))) {
 			item.sendCommand(0);
 			return true;
 		}
@@ -63,6 +67,7 @@ public class GoeCharger_API2 extends Charger {
 	protected boolean switchOff() {
 		// In API version 2 the switch is read only
 		// set force state to neutral (Neutral=0, Off=1, On=2)
+		super.switchOff();
 		JRuleNumberItem item = getForceStateItem();
 		if (item != null && (item.getState() == null || item.getStateAsDecimal().intValue() != 1)) {
 			item.sendCommand(1);
@@ -76,11 +81,10 @@ public class GoeCharger_API2 extends Charger {
 	}
 
 	private boolean switchOn(int phases, int amps) {
-		return setPower(phases, amps) | switchOn();
+		return switchOn() | setPower(phases, amps);
 	}
 	
 	private boolean setPower(int phases, int amps) {
-		boolean changes = setPhases(phases);
 		if (amps < getMinAmps(phases)) {
 			amps = getMinAmps(phases);
 		}
@@ -88,7 +92,7 @@ public class GoeCharger_API2 extends Charger {
 			amps = MAX_AMPS;
 		}
 		setAmps(amps);
-		return changes;
+		return setPhases(phases);
 	}
 	
 	private Double getMinimPhase1Power() {

@@ -60,6 +60,7 @@ class TestCharger {
 	@Test
 	void testChargerModeRulesUSE_EXPORTActivated_StreadySunUp() {
 		Charger charger1 = getTestCharger(1);
+		charger1.activateFastCharging();
 		// Rules mode.
 		charger1.handleMode("OFF");
 		charger1.enableRule(RULE_NAME.USE_EXPORT.toString());
@@ -139,6 +140,7 @@ class TestCharger {
 	@Test
 	void testChargerModeRulesPVActivated_PhaseTransition() {
 		Charger charger1 = getTestCharger(1);
+		charger1.activateFastCharging();
 		// Rules mode.
 		charger1.handleMode("OFF");
 		charger1.enableRule(RULE_NAME.USE_EXPORT.toString());
@@ -314,7 +316,7 @@ class TestCharger {
 		Mockito.when(mock.getSwitchItem(rule_BEST_PRICE_switch.getName())).thenReturn(rule_BEST_PRICE_switch);
 		Mockito.when(mock.getStringItem(evcr_charger_TIMER_start.getName())).thenReturn(evcr_charger_TIMER_start);
 		Mockito.when(mock.getStringItem(evcr_charger_TIMER_finish.getName())).thenReturn(evcr_charger_TIMER_finish);
-		return new GoeCharger_API1(mock, number);
+		return new GoeCharger_API2(mock, number);
 	}
 	
 	private void sendPVData(Charger charger, double gridPower, boolean isOn, int phases, int  amps) {

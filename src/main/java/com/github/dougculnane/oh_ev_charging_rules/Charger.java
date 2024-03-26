@@ -35,7 +35,6 @@ public abstract class Charger {
 	public Charger(OpenHabEnvironment openHabEnvironment, int number) {
 		this.openHabEnvironment = openHabEnvironment;
 		this.number = number;
-		activateFastCharging();
 	}
 	
 	abstract boolean switchOn(double watts);
@@ -422,7 +421,7 @@ public abstract class Charger {
 	private JRuleSwitchItem getRuleSwitchItem(RULE_NAME ruleName) {
 		return openHabEnvironment.getSwitchItem("evcr_charger_" + number + "_" + ruleName.toString() + "_switch");
 	}
-	private JRuleSwitchItem getSwitchItem() {
+	protected JRuleSwitchItem getSwitchItem() {
 		return openHabEnvironment.getSwitchItem("evcr_charger_" + number + "_switch");
 	}
 	protected JRuleNumberItem getAmpsItem() {
