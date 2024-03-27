@@ -9,7 +9,7 @@ props:
       required: true
       type: TEXT
   parameterGroups: []
-timestamp: Mar 16, 2024, 11:04:56 AM
+timestamp: Mar 26, 2024, 2:55:41 PM
 component: f7-card
 config: {}
 slots:
@@ -36,34 +36,34 @@ slots:
                           default:
                             - component: oh-button
                               config:
-                                text: Off
+                                action: command
+                                actionCommand: OFF
+                                actionItem: ="evcr_charger_"+props.chargerNumber+"_mode"
+                                active: =((items["evcr_charger_"+props.chargerNumber+"_mode"]).state === 'OFF')
                                 iconF7: bolt_slash
                                 outline: true
                                 round: true
-                                action: command
-                                actionItem: ="evcr_charger_"+props.chargerNumber+"_mode"
-                                actionCommand: OFF
-                                active: =((items["evcr_charger_"+props.chargerNumber+"_mode"]).state === 'OFF')
+                                text: Off
                             - component: oh-button
                               config:
-                                text: Rules
+                                action: command
+                                actionCommand: RULES
+                                actionItem: ="evcr_charger_"+props.chargerNumber+"_mode"
+                                active: =((items["evcr_charger_"+props.chargerNumber+"_mode"]).state === 'RULES')
                                 iconF7: list_dash
                                 outline: true
                                 round: true
-                                action: command
-                                actionItem: ="evcr_charger_"+props.chargerNumber+"_mode"
-                                actionCommand: RULES
-                                active: =((items["evcr_charger_"+props.chargerNumber+"_mode"]).state === 'RULES')
+                                text: Rules
                             - component: oh-button
                               config:
-                                text: Fast
+                                action: command
+                                actionCommand: FAST
+                                actionItem: ="evcr_charger_"+props.chargerNumber+"_mode"
+                                active: =((items["evcr_charger_"+props.chargerNumber+"_mode"]).state === 'FAST')
                                 iconF7: bolt_fill
                                 outline: true
                                 round: true
-                                action: command
-                                actionItem: ="evcr_charger_"+props.chargerNumber+"_mode"
-                                actionCommand: FAST
-                                active: =((items["evcr_charger_"+props.chargerNumber+"_mode"]).state === 'FAST')
+                                text: Fast
           - component: oh-list-item
             config:
               icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) == "TIMER")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_TIMER_switch"].state) == "ON")?"f7:checkmark_alt_circle":"f7:circle"
@@ -163,7 +163,7 @@ slots:
           - component: oh-list-item
             config:
               icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) == "USE_EXPORT")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_USE_EXPORT_switch"].state) == "ON")?"f7:checkmark_alt_circle":"f7:circle"
-              title: ="Use exported power rule"+(((items["evcr_charger_"+props.chargerNumber+"_USE_EXPORT_switch"].state) == "ON")? " (" + (items.evcr_export_power.state) + " W)":"")
+              title: ="Use export rule"+(((items["evcr_charger_"+props.chargerNumber+"_USE_EXPORT_switch"].state) == "ON")? " (" + (items.evcr_export_power.state) + " W)":"")
             slots:
               accordion:
                 - component: oh-list-card
@@ -222,29 +222,23 @@ slots:
                           default:
                             - component: oh-button
                               config:
-                                text: =(items["evcr_charger_"+props.chargerNumber+"_switch"]).state
+                                active: =((items["evcr_charger_"+props.chargerNumber+"_switch"]).state === 'ON')
                                 iconF7: power
                                 outline: true
                                 round: true
-                                active: =((items["evcr_charger_"+props.chargerNumber+"_switch"]).state === 'ON')
+                                text: =(items["evcr_charger_"+props.chargerNumber+"_switch"]).state
                             - component: oh-button
                               config:
-                                text: =(items["evcr_charger_"+props.chargerNumber+"_power"]).state+" kW"
+                                active: =((items["evcr_charger_"+props.chargerNumber+"_power"]).state > 0)
                                 iconF7: bolt_fill
                                 outline: true
                                 round: true
+                                text: =(items["evcr_charger_"+props.chargerNumber+"_power"]).state+" W"
                             - component: oh-button
                               config:
-                                text: =(items["evcr_charger_"+props.chargerNumber+"_phases"]).state+" Phases"
-                                iconF7: bolt_horizontal_fill
                                 outline: true
                                 round: true
-                            - component: oh-button
-                              config:
-                                text: =(items["evcr_charger_"+props.chargerNumber+"_amps"]).state+" Amps"
-                                iconF7: dot_square
-                                outline: true
-                                round: true
+                                text: =(items["evcr_charger_"+props.chargerNumber+"_phases"]).state+" ∿ "+(items["evcr_charger_"+props.chargerNumber+"_amps"]).state
           - component: oh-list-item
             config:
               icon: oh:batterylevel

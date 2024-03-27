@@ -1,9 +1,7 @@
 package com.github.dougculnane.oh_ev_charging_rules;
 
 import org.openhab.automation.jrule.items.JRuleNumberItem;
-import org.openhab.automation.jrule.items.JRuleSwitchItem;
 import org.openhab.automation.jrule.rules.user.OpenHabEnvironment;
-import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 
 /**
  * Uses the Go-eCharger Binding: https://www.openhab.org/addons/bindings/goecharger/ 
@@ -33,9 +31,18 @@ public class GoeCharger_API2 extends Charger {
 
 	@Override
 	boolean switchOn(double watts) {
-		if (watts > getMinimPhase3Power()) {
-				int calcAmps = Double.valueOf(watts / 240 / 3).intValue();;
-				return switchOn(3, calcAmps);
+		int flipFlopMargin = 300;
+		Double min3PhasePower = getMinimPhase3Power();
+		if (watts > min3PhasePower){
+			Integer phases = getPhases();
+			if (phases != null && getPhases() == 3) {
+				// remove the flop margin
+				flipFlopMargin = 0;
+			}
+		}
+		if (watts > min3PhasePower + flipFlopMargin) {
+			int calcAmps = Double.valueOf(watts / 240 / 3).intValue();;
+			return switchOn(3, calcAmps);
 		} else if (watts > getMinimPhase1Power()) {
 			int calcAmps = Double.valueOf(watts / 240).intValue();
 			return switchOn(1, calcAmps);

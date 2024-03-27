@@ -8,9 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.openhab.automation.jrule.items.JRuleDateTimeItem;
 import org.openhab.automation.jrule.items.JRuleNumberItem;
 import org.openhab.automation.jrule.items.JRuleStringItem;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
+import org.openhab.automation.jrule.rules.user.items.MockDateTimeItem;
 import org.openhab.automation.jrule.rules.user.items.MockJRuleNumberItem;
 import org.openhab.automation.jrule.rules.user.items.MockStringItem;
 import org.openhab.automation.jrule.rules.user.items.MockSwitchItem;
@@ -85,7 +87,8 @@ class TestCharger {
 		sendPVData(charger1, 4500, true, 1 , 16);
 		sendPVData(charger1, 5000, true, 1 , 16);
 		sendPVData(charger1, 5500, true, 1 , 16);
-		sendPVData(charger1, 6000, true, 3 , 8);
+		sendPVData(charger1, 6000, true, 1 , 16);
+		sendPVData(charger1, 6300, true, 3 , 8);
 		sendPVData(charger1, 6500, true, 3 , 9);
 		sendPVData(charger1, 7000, true, 3 , 9);
 		sendPVData(charger1, 7500, true, 3 , 10);
@@ -158,10 +161,14 @@ class TestCharger {
 		sendPVData(charger1, 4500, true, 1 , 16);
 		sendPVData(charger1, 5000, true, 1 , 16);
 		sendPVData(charger1, 5500, true, 1 , 16);
+		sendPVData(charger1, 6000, true, 1 , 16);
+		sendPVData(charger1, 6300, true, 3 , 8); // test flip flop.
 		sendPVData(charger1, 6000, true, 3 , 8);
+		sendPVData(charger1, 5800, true, 3 , 8);
 		sendPVData(charger1, 6500, true, 3 , 9);
 		sendPVData(charger1, 5500, true, 1 , 16);
-		sendPVData(charger1, 5800, true, 3 , 8);
+		sendPVData(charger1, 5800, true, 1 , 16);
+		sendPVData(charger1, 6100, true, 3 , 8);
 	    // TODO deal with flutter between phases.
 	}
 	
@@ -175,7 +182,7 @@ class TestCharger {
 		charger1.enableRule(RULE_NAME.USE_EXPORT.toString());
 		assertFastMode(charger1);
 		charger1.handlePolling();
-		charger1.getExportPowerItem().sendCommand(500);
+		charger1.getExportPowerItem().sendCommand(-12000);
 		charger1.getCheapPowerPriceItem().sendCommand(8.08);
 		charger1.getGridPowerPriceItem().sendCommand(20.20);
 		charger1.handlePolling();
@@ -199,6 +206,7 @@ class TestCharger {
 		charger1.getGridPowerPriceItem().sendCommand(7.07);
 		charger1.handlePolling();
 		assertFast(charger1);
+		charger1.getExportPowerItem().sendCommand(charger1.getFastChargeRate() * -1);
 		assertEquals(RULE_NAME.CHEAP, charger1.getActiveRule());
 		charger1.getGridPowerPriceItem().sendCommand(15.15);
 		charger1.handlePolling();
@@ -225,6 +233,47 @@ class TestCharger {
 		assertEquals(RULE_NAME.CHEAP, charger1.getActiveRule());
 	}
 	
+	@Test
+	void testEnableRules() {
+		Charger charger1 = getTestCharger(1);
+		assertFalse(charger1.isRuleEnabled(RULE_NAME.BEST_GRID));
+		assertFalse(charger1.isRuleEnabled(RULE_NAME.CHEAP));
+		assertFalse(charger1.isRuleEnabled(RULE_NAME.TARGET));
+		assertFalse(charger1.isRuleEnabled(RULE_NAME.TIMER));
+		assertFalse(charger1.isRuleEnabled(RULE_NAME.USE_EXPORT));
+		charger1.enableRule(RULE_NAME.BEST_GRID.toString());
+		charger1.enableRule(RULE_NAME.CHEAP.toString());
+		charger1.enableRule(RULE_NAME.TARGET.toString());
+		charger1.enableRule(RULE_NAME.TIMER.toString());
+		charger1.enableRule(RULE_NAME.USE_EXPORT.toString());
+		assertTrue(charger1.isRuleEnabled(RULE_NAME.BEST_GRID));
+		assertTrue(charger1.isRuleEnabled(RULE_NAME.CHEAP));
+		assertTrue(charger1.isRuleEnabled(RULE_NAME.TARGET));
+		assertTrue(charger1.isRuleEnabled(RULE_NAME.TIMER));
+		assertTrue(charger1.isRuleEnabled(RULE_NAME.USE_EXPORT));
+	}
+	
+	@Test
+	void testChargerModeRulesBestPrice() {
+
+		Charger charger1 = getTestCharger(1);
+		// Rules mode.
+		charger1.handleMode("OFF");
+		charger1.enableRule(RULE_NAME.BEST_GRID.toString());
+		charger1.enableRule(RULE_NAME.USE_EXPORT.toString());
+		assertOffMode(charger1);
+		charger1.handleMode("RULES");
+		sendPVData(charger1, 1500, true, 1, 6);
+		sendPVData(charger1, 1700, true, 1, 7);
+		assertEquals(RULE_NAME.USE_EXPORT, charger1.getActiveRule());
+		Calendar cal = Calendar.getInstance();
+		charger1.getBestGridStartItem().sendCommand(cal.getTime());
+		cal.add(Calendar.MINUTE, 5);
+		charger1.getBestGridFinishItem().sendCommand(cal.getTime());
+		charger1.handlePolling();
+		assertEquals(RULE_NAME.BEST_GRID, charger1.getActiveRule());
+		assertFast(charger1);
+	}
 	
 	@Test
 	void testChargerModeRulesCheapOverridesExported() {
@@ -298,7 +347,9 @@ class TestCharger {
 		final JRuleSwitchItem rule_TIMER_switch	= new MockSwitchItem("evcr_charger_" + number + "_TIMER_switch");
 		final JRuleStringItem evcr_charger_TIMER_start = new MockStringItem("evcr_charger_" + number + "_TIMER_start");
 		final JRuleStringItem evcr_charger_TIMER_finish = new MockStringItem("evcr_charger_" + number + "_TIMER_finish");
-		final JRuleSwitchItem rule_BEST_PRICE_switch = new MockSwitchItem("evcr_charger_" + number + "_BEST_PRICE_switch");
+		final JRuleSwitchItem rule_BEST_GRID_switch = new MockSwitchItem("evcr_charger_" + number + "_BEST_GRID_switch");	
+		final JRuleDateTimeItem evcr_charger_BEST_GRID_start = new MockDateTimeItem("evcr_charger_" + number + "_BEST_GRID_start");
+		final JRuleDateTimeItem evcr_charger_BEST_GRID_finish = new MockDateTimeItem("evcr_charger_" + number + "_BEST_GRID_finish");
 		OpenHabEnvironment mock =  Mockito.mock(OpenHabEnvironment.class);
 		Mockito.when(mock.getNumberItem(gridPower.getName())).thenReturn(gridPower);
 		Mockito.when(mock.getNumberItem(gridPowerPrice.getName())).thenReturn(gridPowerPrice);
@@ -313,14 +364,16 @@ class TestCharger {
 		Mockito.when(mock.getSwitchItem(rule_USE_EXPORT_switch.getName())).thenReturn(rule_USE_EXPORT_switch);
 		Mockito.when(mock.getSwitchItem(rule_TARGET_switch.getName())).thenReturn(rule_TARGET_switch);
 		Mockito.when(mock.getSwitchItem(rule_TIMER_switch.getName())).thenReturn(rule_TIMER_switch);
-		Mockito.when(mock.getSwitchItem(rule_BEST_PRICE_switch.getName())).thenReturn(rule_BEST_PRICE_switch);
+		Mockito.when(mock.getSwitchItem(rule_BEST_GRID_switch.getName())).thenReturn(rule_BEST_GRID_switch);
 		Mockito.when(mock.getStringItem(evcr_charger_TIMER_start.getName())).thenReturn(evcr_charger_TIMER_start);
 		Mockito.when(mock.getStringItem(evcr_charger_TIMER_finish.getName())).thenReturn(evcr_charger_TIMER_finish);
+		Mockito.when(mock.getDateTimeItem(evcr_charger_BEST_GRID_start.getName())).thenReturn(evcr_charger_BEST_GRID_start);
+		Mockito.when(mock.getDateTimeItem(evcr_charger_BEST_GRID_finish.getName())).thenReturn(evcr_charger_BEST_GRID_finish);
 		return new GoeCharger_API2(mock, number);
 	}
 	
 	private void sendPVData(Charger charger, double gridPower, boolean isOn, int phases, int  amps) {
-		charger.getExportPowerItem().sendCommand(gridPower);
+		charger.getExportPowerItem().sendCommand(gridPower - charger.getChargingPower());
 		charger.handlePolling();
 		assertEquals(isOn, charger.isOn());
 		if (charger.isOn()) {

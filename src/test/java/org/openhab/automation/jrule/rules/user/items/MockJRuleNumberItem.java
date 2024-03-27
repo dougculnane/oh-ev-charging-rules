@@ -10,7 +10,6 @@ public class MockJRuleNumberItem extends MockJRuleItem implements JRuleNumberIte
 
 	public MockJRuleNumberItem(String name) {
 		super(name);
-		//this.value = new JRuleDecimalValue("0");
 	}
 	
 	@Override

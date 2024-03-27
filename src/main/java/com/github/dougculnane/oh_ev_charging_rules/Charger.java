@@ -8,7 +8,6 @@ import org.openhab.automation.jrule.items.JRuleDateTimeItem;
 import org.openhab.automation.jrule.items.JRuleNumberItem;
 import org.openhab.automation.jrule.items.JRuleStringItem;
 import org.openhab.automation.jrule.items.JRuleSwitchItem;
-import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.user.OpenHabEnvironment;
 import org.openhab.automation.jrule.rules.value.JRuleDateTimeValue;
 import org.openhab.automation.jrule.rules.value.JRuleDecimalValue;
@@ -17,34 +16,34 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 public abstract class Charger {
 
 	final protected OpenHabEnvironment openHabEnvironment;
-	
+
 	enum MODE_VALUE {
 		OFF, FAST, RULES
 	}
-	
+
 	enum RULE_NAME {
 		CHEAP, BEST_GRID, USE_EXPORT, TARGET, TIMER
 	}
-	
+
 	int number;
-	
+
 	public Charger(int number) {
 		this(new OpenHabEnvironment(), number);
 	}
-	
+
 	public Charger(OpenHabEnvironment openHabEnvironment, int number) {
 		this.openHabEnvironment = openHabEnvironment;
 		this.number = number;
 	}
-	
+
 	abstract boolean switchOn(double watts);
-	
+
 	abstract double getMinimPower();
-	
+
 	abstract double getFastChargeRate();
-	
+
 	abstract boolean activateFastCharging();
-	
+
 	/**
 	 * @param modeValue
 	 * @return Create lock
@@ -67,39 +66,37 @@ public abstract class Charger {
 			throw new IllegalArgumentException("Unexpected evcr_charger_" + number + " value: " + modeValue);
 		}
 	}
-	
+
 	public boolean handlePolling() {
 		if (getMode() != MODE_VALUE.RULES) {
 			return handleMode(getMode().toString());
 		}
 		final Car car = getConnectedCar();
-		if (car != null && car.targetLevelReached() ) {
-        	setActiveRule(RULE_NAME.TARGET);
-        	return switchOff();
-        }
-		if (getActiveRule() == RULE_NAME.TARGET) {
-			setActiveRule(null);
+		if (car != null) {
+			if (car.targetLevelReached()) {
+				setActiveRule(RULE_NAME.TARGET);
+				return switchOff();
+			} else if (getActiveRule() == RULE_NAME.TARGET) {
+				setActiveRule(null);
+			}
 		}
-		
+
 		boolean fastChargingActivated = false;
-		
+
 		// TIMER
 		if (!fastChargingActivated && isRuleEnabled(RULE_NAME.TIMER)) {
 			Date now = new Date();
 			Date timerStart = getTimerStart();
 			Date timerFinish = getTimerFinish();
-			if (timerStart != null 
-					&& timerFinish != null
-					&& now.after(timerStart) 
-					&& now.before(timerFinish)) {
+			if (timerStart != null && timerFinish != null && now.after(timerStart) && now.before(timerFinish)) {
 				setActiveRule(RULE_NAME.TIMER);
 				fastChargingActivated = true;
 			} else if (getActiveRule() == RULE_NAME.TIMER) {
 				setActiveRule(null);
 			}
 		}
-		
-		// CHEAP 
+
+		// CHEAP
 		if (!fastChargingActivated && isRuleEnabled(RULE_NAME.CHEAP)) {
 			double cheapPowerPrice = getCheapPowerPrice();
 			double gridPowerPrice = getGridPowerPrice();
@@ -110,15 +107,13 @@ public abstract class Charger {
 				setActiveRule(null);
 			}
 		}
-		
+
 		// BEST_GRID
 		if (!fastChargingActivated && isRuleEnabled(RULE_NAME.BEST_GRID)) {
 			ZonedDateTime now = ZonedDateTime.now();
-			ZonedDateTime bestPriceStart = getBestPriceStart();
-			ZonedDateTime bestPriceFinish = getBestPriceFinish();
-			if (bestPriceStart != null 
-					&& bestPriceFinish != null
-					&& now.isAfter(bestPriceStart) 
+			ZonedDateTime bestPriceStart = getBestGridStart();
+			ZonedDateTime bestPriceFinish = getBestGridFinish();
+			if (bestPriceStart != null && bestPriceFinish != null && now.isAfter(bestPriceStart)
 					&& now.isBefore(bestPriceFinish)) {
 				setActiveRule(RULE_NAME.BEST_GRID);
 				fastChargingActivated = true;
@@ -126,24 +121,21 @@ public abstract class Charger {
 				setActiveRule(null);
 			}
 		}
-		
+
 		// TARGET
-		if (!fastChargingActivated 
-				&& car != null 
-				&& isRuleEnabled(RULE_NAME.TARGET)
-				&& car.getTargetTime() != null) {
+		if (!fastChargingActivated && car != null && isRuleEnabled(RULE_NAME.TARGET) && car.getTargetTime() != null) {
 			int neededMins = car.getMinutesNeededForTarget(getFastChargeRate());
 			Calendar now = Calendar.getInstance();
 			Calendar cal = car.getTargetTime();
-			cal.add(Calendar.MINUTE, (neededMins * -1));
-			if (neededMins > 0	&&  cal.before(now)) {
+			cal.add(Calendar.MINUTE, (neededMins * -1) - 30);
+			if (neededMins > 0 && cal.before(now)) {
 				setActiveRule(RULE_NAME.TARGET);
 				fastChargingActivated = true;
 			} else if (getActiveRule() == RULE_NAME.TARGET) {
 				setActiveRule(null);
 			}
 		}
-		
+
 		// USE Export or switch off
 		if (fastChargingActivated) {
 			return activateFastCharging();
@@ -154,7 +146,7 @@ public abstract class Charger {
 		}
 		return false;
 	}
-	
+
 	public boolean handleExportPower(double wattsExported) {
 		if (getMode() == MODE_VALUE.RULES && isRuleEnabled(RULE_NAME.USE_EXPORT)) {
 			// Block if other rules are active.
@@ -163,18 +155,31 @@ public abstract class Charger {
 				// Then we are not in control.
 				return false;
 			}
-			
-			double chargingPower = getChargingPower();
-			if (wattsExported + chargingPower > getMinimPower()) {
+
+			double avaiablePower = wattsExported + getChargingPower();
+			if (avaiablePower > getMinimPower()) {
 				setActiveRule(RULE_NAME.USE_EXPORT);
-				return switchOn((wattsExported + chargingPower));
+				return switchOn(avaiablePower);
 			} else {
 				setActiveRule(null);
 				return switchOff();
 			}
 		}
 		return false;
-	} 
+	}
+
+	protected double getChargingPower() {
+		// Get power from the item that is linked to the charger output hopefully.
+		JRuleNumberItem item = getChargingPowerItem();
+		if (item != null && item.getState() != null) {
+			return item.getStateAsDecimal().doubleValue();
+		}
+		// Calculate the power based on state information.
+		if (isOn()) {
+			return (getPhases() * getAmps() * 240);
+		}
+		return 0;
+	}
 
 	public String getName() {
 		JRuleStringItem item = getNameItem();
@@ -183,17 +188,17 @@ public abstract class Charger {
 		}
 		return "evcr_charger_" + number;
 	}
-	
+
 	protected boolean setAmps(int amps) {
 		JRuleNumberItem ampsItem = getAmpsItem();
-		if (ampsItem != null 
-				&& (ampsItem.getState() == null || ampsItem.getStateAsDecimal() == null || ampsItem.getStateAsDecimal().intValue() != amps)) {
+		if (ampsItem != null && (ampsItem.getState() == null || ampsItem.getStateAsDecimal() == null
+				|| ampsItem.getStateAsDecimal().intValue() != amps)) {
 			ampsItem.sendCommand(new JRuleDecimalValue(amps));
 			return true;
 		}
 		return false;
 	}
-	
+
 	private Car getConnectedCar() {
 		JRuleNumberItem item = getConnectedCarItem();
 		if (item != null && item.getState() != null) {
@@ -212,7 +217,7 @@ public abstract class Charger {
 				cal.set(Calendar.MINUTE, Integer.valueOf(value[1]));
 				return cal.getTime();
 			}
-			
+
 		}
 		return null;
 	}
@@ -227,7 +232,7 @@ public abstract class Charger {
 				cal.set(Calendar.MINUTE, Integer.valueOf(value[1]));
 				return cal.getTime();
 			}
-			
+
 		}
 		return null;
 	}
@@ -240,14 +245,6 @@ public abstract class Charger {
 		return 0;
 	}
 
-	private double getChargingPower() {
-		JRuleNumberItem item = getChargingPowerItem();
-		if (item != null && item.getState() != null) {
-			return item.getStateAsDecimal().doubleValue();
-		}
-		return 0;
-	}
-	
 	private double getGridPowerPrice() {
 		JRuleNumberItem item = getGridPowerPriceItem();
 		if (item != null && item.getState() != null) {
@@ -266,36 +263,36 @@ public abstract class Charger {
 
 	protected boolean switchOn() {
 		JRuleSwitchItem switchItem = getSwitchItem();
-		if (switchItem != null && (switchItem.getState() == null || switchItem.getStateAsOnOff() != JRuleOnOffValue.ON)) {
+		if (switchItem != null
+				&& (switchItem.getState() == null || switchItem.getStateAsOnOff() != JRuleOnOffValue.ON)) {
 			switchItem.sendCommand(JRuleOnOffValue.ON);
 			return true;
 		}
 		return false;
 	}
-	
+
 	protected boolean switchOff() {
 		JRuleSwitchItem switchItem = getSwitchItem();
-		if (switchItem != null && (switchItem.getState() == null || switchItem.getStateAsOnOff() != JRuleOnOffValue.OFF)) {
+		if (switchItem != null
+				&& (switchItem.getState() == null || switchItem.getStateAsOnOff() != JRuleOnOffValue.OFF)) {
 			switchItem.sendCommand(JRuleOnOffValue.OFF);
 			return true;
 		}
 		return false;
 	}
-	
+
 	protected boolean isOn() {
 		JRuleSwitchItem switchItem = getSwitchItem();
-		return switchItem != null 
-				&& switchItem.getState() != null 
+		return switchItem != null && switchItem.getState() != null
 				&& switchItem.getStateAsOnOff() == JRuleOnOffValue.ON;
 	}
-	
+
 	protected boolean isOff() {
 		JRuleSwitchItem switchItem = getSwitchItem();
-		return switchItem == null
-				|| switchItem.getState() == null 
+		return switchItem == null || switchItem.getState() == null
 				|| switchItem.getStateAsOnOff() == JRuleOnOffValue.OFF;
 	}
-	
+
 	protected int getAmps() {
 		JRuleNumberItem item = getAmpsItem();
 		if (item != null && item.getState() != null) {
@@ -303,14 +300,12 @@ public abstract class Charger {
 		}
 		return 0;
 	}
-	
+
 	boolean isRuleEnabled(RULE_NAME ruleName) {
 		JRuleSwitchItem item = getRuleSwitchItem(ruleName);
-		return item != null 
-				&& item.getState() != null 
-				&& item.getStateAsOnOff() == JRuleOnOffValue.ON;
+		return item != null && item.getState() != null && item.getStateAsOnOff() == JRuleOnOffValue.ON;
 	}
-	
+
 	public void enableRule(String ruleName) {
 		try {
 			RULE_NAME rule = RULE_NAME.valueOf(ruleName);
@@ -335,10 +330,10 @@ public abstract class Charger {
 		} catch (IllegalArgumentException e) {
 		}
 	}
-	
+
 	public RULE_NAME getActiveRule() {
 		JRuleStringItem activeRuleItem = getActiveRuleItem();
-		if (activeRuleItem != null &&  activeRuleItem.getState() != null) {
+		if (activeRuleItem != null && activeRuleItem.getState() != null) {
 			try {
 				return RULE_NAME.valueOf(activeRuleItem.getStateAsString());
 			} catch (IllegalArgumentException e) {
@@ -347,20 +342,18 @@ public abstract class Charger {
 		}
 		return null;
 	}
-	
+
 	private void setActiveRule(RULE_NAME ruleName) {
 		JRuleStringItem activeRuleItem = getActiveRuleItem();
-		if (ruleName != null 
-				&& activeRuleItem != null 
-				&& (activeRuleItem.getState() == null || !activeRuleItem.getStateAsString().equals(ruleName.toString()))) {
+		if (ruleName != null && activeRuleItem != null && (activeRuleItem.getState() == null
+				|| !activeRuleItem.getStateAsString().equals(ruleName.toString()))) {
 			activeRuleItem.sendCommand(ruleName.toString());
-		} else if (ruleName == null 
-				&& activeRuleItem != null 
-				&& (activeRuleItem.getState() == null || (activeRuleItem.getState() != null && !activeRuleItem.getStateAsString().equals("")))) {
+		} else if (ruleName == null && activeRuleItem != null && (activeRuleItem.getState() == null
+				|| (activeRuleItem.getState() != null && !activeRuleItem.getStateAsString().equals("")))) {
 			activeRuleItem.sendCommand("");
 		}
 	}
-	
+
 	public MODE_VALUE getMode() {
 		JRuleStringItem modeItem = getModeItem();
 		if (modeItem != null && modeItem.getState() != null) {
@@ -373,14 +366,14 @@ public abstract class Charger {
 		handleMode(MODE_VALUE.FAST.toString());
 		return MODE_VALUE.FAST;
 	}
-	
+
 	public void setMode(MODE_VALUE mode) {
 		JRuleStringItem modeItem = getModeItem();
 		if (modeItem != null && (modeItem.getState() == null || !modeItem.getStateAsString().equals(mode.toString()))) {
 			modeItem.sendCommand(mode.toString());
 		}
 	}
-	
+
 	public Integer getPhases() {
 		JRuleNumberItem item = getPhasesItem();
 		if (item != null && item.getState() != null) {
@@ -388,81 +381,95 @@ public abstract class Charger {
 		}
 		return null;
 	}
-	
+
 	protected boolean setPhases(int phases) {
 		JRuleNumberItem phasesItem = getPhasesItem();
-		if ((phases == 1 || phases == 3)
-			&& phasesItem != null 
-			&& (phasesItem.getState() == null || phasesItem.getStateAsDecimal().intValue() != phases)) {
+		if ((phases == 1 || phases == 3) && phasesItem != null
+				&& (phasesItem.getState() == null || phasesItem.getStateAsDecimal().intValue() != phases)) {
 			phasesItem.sendCommand(new JRuleDecimalValue(phases));
 			return true;
 		}
 		return false;
 	}
-	
-	private ZonedDateTime getBestPriceFinish() {
-		JRuleDateTimeItem item = getBestPriceFinishItem();
-		if (item != null && item.getState() == null) {
+
+	private ZonedDateTime getBestGridFinish() {
+		JRuleDateTimeItem item = getBestGridFinishItem();
+		if (item != null && item.getState() != null) {
 			JRuleDateTimeValue value = item.getStateAsDateTime();
 			return value.getValue();
 		}
 		return null;
 	}
 
-	private ZonedDateTime getBestPriceStart() {
-		JRuleDateTimeItem item = getBestPriceStartItem();
-		if (item != null && item.getState() == null) {
+	private ZonedDateTime getBestGridStart() {
+		JRuleDateTimeItem item = getBestGridStartItem();
+		if (item != null && item.getState() != null) {
 			JRuleDateTimeValue value = item.getStateAsDateTime();
 			return value.getValue();
 		}
 		return null;
 	}
-	
-	private JRuleSwitchItem getRuleSwitchItem(RULE_NAME ruleName) {
-		return openHabEnvironment.getSwitchItem("evcr_charger_" + number + "_" + ruleName.toString() + "_switch");
-	}
-	protected JRuleSwitchItem getSwitchItem() {
-		return openHabEnvironment.getSwitchItem("evcr_charger_" + number + "_switch");
-	}
-	protected JRuleNumberItem getAmpsItem() {
-		return openHabEnvironment.getNumberItem("evcr_charger_" + number + "_amps");
-	}
-	protected JRuleNumberItem getPhasesItem() {
-		return openHabEnvironment.getNumberItem("evcr_charger_" + number + "_phases");
-	}
-	protected JRuleNumberItem getExportPowerItem() {
-		return openHabEnvironment.getNumberItem("evcr_export_power");
-	}
-	protected JRuleNumberItem getCheapPowerPriceItem() {
-		return openHabEnvironment.getNumberItem("evcr_cheap_power_price");
-	}
-	protected JRuleNumberItem getGridPowerPriceItem() {
-		return openHabEnvironment.getNumberItem("evcr_grid_power_price");
-	}
+
 	private JRuleNumberItem getChargingPowerItem() {
 		return openHabEnvironment.getNumberItem("evcr_charger_" + number + "_power");
 	}
+
+	private JRuleSwitchItem getRuleSwitchItem(RULE_NAME ruleName) {
+		return openHabEnvironment.getSwitchItem("evcr_charger_" + number + "_" + ruleName.toString() + "_switch");
+	}
+
+	protected JRuleSwitchItem getSwitchItem() {
+		return openHabEnvironment.getSwitchItem("evcr_charger_" + number + "_switch");
+	}
+
+	protected JRuleNumberItem getAmpsItem() {
+		return openHabEnvironment.getNumberItem("evcr_charger_" + number + "_amps");
+	}
+
+	protected JRuleNumberItem getPhasesItem() {
+		return openHabEnvironment.getNumberItem("evcr_charger_" + number + "_phases");
+	}
+
+	protected JRuleNumberItem getExportPowerItem() {
+		return openHabEnvironment.getNumberItem("evcr_export_power");
+	}
+
+	protected JRuleNumberItem getCheapPowerPriceItem() {
+		return openHabEnvironment.getNumberItem("evcr_cheap_power_price");
+	}
+
+	protected JRuleNumberItem getGridPowerPriceItem() {
+		return openHabEnvironment.getNumberItem("evcr_grid_power_price");
+	}
+
 	private JRuleStringItem getModeItem() {
 		return openHabEnvironment.getStringItem("evcr_charger_" + number + "_mode");
 	}
+
 	private JRuleStringItem getActiveRuleItem() {
 		return openHabEnvironment.getStringItem("evcr_charger_" + number + "_active_rule");
 	}
-	private JRuleDateTimeItem getBestPriceFinishItem() {
-		return openHabEnvironment.getDateTimeItem("evcr_charger_" + number + "_BEST_PRICE_finish");
+
+	protected JRuleDateTimeItem getBestGridFinishItem() {
+		return openHabEnvironment.getDateTimeItem("evcr_charger_" + number + "_BEST_GRID_finish");
 	}
-	private JRuleDateTimeItem getBestPriceStartItem() {
-		return openHabEnvironment.getDateTimeItem("evcr_charger_" + number + "_BEST_PRICE_start");
+
+	protected JRuleDateTimeItem getBestGridStartItem() {
+		return openHabEnvironment.getDateTimeItem("evcr_charger_" + number + "_BEST_GRID_start");
 	}
+
 	protected JRuleStringItem getTimerFinishItem() {
 		return openHabEnvironment.getStringItem("evcr_charger_" + number + "_TIMER_finish");
 	}
+
 	protected JRuleStringItem getTimerStartItem() {
 		return openHabEnvironment.getStringItem("evcr_charger_" + number + "_TIMER_start");
 	}
+
 	protected JRuleStringItem getNameItem() {
 		return openHabEnvironment.getStringItem("evcr_charger_" + number + "_name");
 	}
+
 	private JRuleNumberItem getConnectedCarItem() {
 		return openHabEnvironment.getNumberItem("evcr_charger_" + number + "_connected_car");
 	}

@@ -26,13 +26,21 @@ public class TestCar {
 	@Test
 	void testMinutesNeededForTarget() {
 		Car car = getTestCar(1);
-		assertEquals(360, car.getMinutesNeededForTarget(10000));
+		assertEquals(300, car.getMinutesNeededForTarget(10000));
 		car.getTargetLevelItem().sendCommand(50);
-		assertEquals(180, car.getMinutesNeededForTarget(10000));
+		assertEquals(150, car.getMinutesNeededForTarget(10000));
 		car.getBatteryLevelItem().sendCommand(50);
 		assertEquals(0, car.getMinutesNeededForTarget(10000));
 		car.getTargetLevelItem().sendCommand(100);
-		assertEquals(210, car.getMinutesNeededForTarget(10000));
+		assertEquals(150, car.getMinutesNeededForTarget(10000));
+	}
+	
+	@Test
+	void testGetTargetTime() {
+		Car car = getTestCar(1);
+		car.getTargetLevelItem().sendCommand(80);
+		car.getBatteryLevelItem().sendCommand(50);
+		assertEquals(90, car.getMinutesNeededForTarget(10000));
 	}
 	
 	private Car getTestCar(int number) {
@@ -45,5 +53,4 @@ public class TestCar {
 		Mockito.when(mock.getNumberItem(battery.getName())).thenReturn(battery);
 		return new Car(mock, number);
 	}
-	
 }
