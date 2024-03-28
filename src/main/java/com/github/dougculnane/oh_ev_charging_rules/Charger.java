@@ -76,8 +76,6 @@ public abstract class Charger {
 			if (car.targetLevelReached()) {
 				setActiveRule(RULE_NAME.TARGET);
 				return switchOff();
-			} else if (getActiveRule() == RULE_NAME.TARGET) {
-				setActiveRule(null);
 			}
 		}
 
@@ -123,17 +121,24 @@ public abstract class Charger {
 		}
 
 		// TARGET
-		if (!fastChargingActivated && car != null && isRuleEnabled(RULE_NAME.TARGET) && car.getTargetTime() != null) {
+		if (!fastChargingActivated && car != null 
+				&& isRuleEnabled(RULE_NAME.TARGET) 
+				&& car != null 
+				&& car.getTargetTime() != null) {
+			int bufferMins = 30;
 			int neededMins = car.getMinutesNeededForTarget(getFastChargeRate());
-			Calendar now = Calendar.getInstance();
 			Calendar cal = car.getTargetTime();
-			cal.add(Calendar.MINUTE, (neededMins * -1) - 30);
-			if (neededMins > 0 && cal.before(now)) {
+			cal.add(Calendar.MINUTE, (neededMins * -1) - bufferMins);
+			if (neededMins > (0 - bufferMins)
+					&& cal.before(Calendar.getInstance())) {
 				setActiveRule(RULE_NAME.TARGET);
 				fastChargingActivated = true;
 			} else if (getActiveRule() == RULE_NAME.TARGET) {
 				setActiveRule(null);
 			}
+		} else if (getActiveRule() == RULE_NAME.TARGET 
+				&& (car == null || !car.targetLevelReached())) {
+			setActiveRule(null);
 		}
 
 		// USE Export or switch off
@@ -155,30 +160,29 @@ public abstract class Charger {
 				// Then we are not in control.
 				return false;
 			}
-
-			double avaiablePower = wattsExported + getChargingPower();
-			if (avaiablePower > getMinimPower()) {
-				setActiveRule(RULE_NAME.USE_EXPORT);
-				return switchOn(avaiablePower);
-			} else {
-				setActiveRule(null);
-				return switchOff();
+			
+			Double chargingPower = getChargingPower();
+			if (chargingPower != null) {
+				double availablePower = wattsExported + chargingPower;
+				if (availablePower > getMinimPower()) {
+					setActiveRule(RULE_NAME.USE_EXPORT);
+					return switchOn(availablePower);
+				} else {
+					setActiveRule(null);
+					return switchOff();
+				}
 			}
 		}
 		return false;
 	}
 
-	protected double getChargingPower() {
+	protected Double getChargingPower() {
 		// Get power from the item that is linked to the charger output hopefully.
 		JRuleNumberItem item = getChargingPowerItem();
 		if (item != null && item.getState() != null) {
 			return item.getStateAsDecimal().doubleValue();
 		}
-		// Calculate the power based on state information.
-		if (isOn()) {
-			return (getPhases() * getAmps() * 240);
-		}
-		return 0;
+		return null;
 	}
 
 	public String getName() {
@@ -410,7 +414,7 @@ public abstract class Charger {
 		return null;
 	}
 
-	private JRuleNumberItem getChargingPowerItem() {
+	protected JRuleNumberItem getChargingPowerItem() {
 		return openHabEnvironment.getNumberItem("evcr_charger_" + number + "_power");
 	}
 

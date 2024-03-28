@@ -29,14 +29,8 @@ public class Car {
 		int target = getTargetLevel();;
 		int level = getBatteryLevel();
 		int batterSizeKW =  getBatterySize();
-		double neededKW = batterSizeKW * (target-level) / 100;
-		Double minutes = neededKW * 60000 / chargeRateWatts;
-//		if (target > 90) {
-//			minutes = minutes + 30; // add hours for slower charging rate.
-//		}
-//		if (neededKW > 0) {
-//			minutes = minutes + 30; // Add half an hours for losses.
-//		}
+		double neededW = (batterSizeKW * 1000 * (target-level)) / 100;
+		Double minutes = neededW * 60 / chargeRateWatts;
 		return minutes.intValue();
 	}
 	

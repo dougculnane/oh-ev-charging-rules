@@ -35,7 +35,7 @@ public class GoeCharger_API2 extends Charger {
 		Double min3PhasePower = getMinimPhase3Power();
 		if (watts > min3PhasePower){
 			Integer phases = getPhases();
-			if (phases != null && getPhases() == 3) {
+			if (phases != null && phases == 3) {
 				// remove the flop margin
 				flipFlopMargin = 0;
 			}

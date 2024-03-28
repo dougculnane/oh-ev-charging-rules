@@ -373,7 +373,7 @@ class TestCharger {
 	}
 	
 	private void sendPVData(Charger charger, double gridPower, boolean isOn, int phases, int  amps) {
-		charger.getExportPowerItem().sendCommand(gridPower - charger.getChargingPower());
+		charger.getExportPowerItem().sendCommand(gridPower - getChargingPower(charger));
 		charger.handlePolling();
 		assertEquals(isOn, charger.isOn());
 		if (charger.isOn()) {
@@ -383,8 +383,17 @@ class TestCharger {
 		}
 		assertEquals(phases, charger.getPhases());
 		assertEquals(amps, charger.getAmps());
+		charger.getChargingPowerItem().sendCommand(charger.getAmps() * charger.getPhases() * 240);
 	}
 	
+	private double getChargingPower(Charger charger) {
+		Double chargeingPower = charger.getChargingPower();
+		if (chargeingPower != null) {
+			return chargeingPower;
+		}
+		return 0;
+	}
+
 	private void assertFastMode(Charger charger) {
 		assertEquals(MODE_VALUE.FAST, charger.getMode());
 		assertFast(charger);
@@ -396,6 +405,7 @@ class TestCharger {
 		assertEquals("evcr_charger_" + charger.number, charger.getName());
 		assertEquals(16, charger.getAmps());
 		assertEquals(3, charger.getPhases());
+		charger.getChargingPowerItem().sendCommand(charger.getAmps() * charger.getPhases() * 240);
 	}
 	
 	private void assertOffMode(Charger charger) {
@@ -407,6 +417,7 @@ class TestCharger {
 		assertFalse(charger.isOn());
 		assertTrue(charger.isOff());
 		assertEquals("evcr_charger_" + charger.number, charger.getName());
+		charger.getChargingPowerItem().sendCommand(0);
 	}
 	
 	private void assertRulesMode(Charger charger) {

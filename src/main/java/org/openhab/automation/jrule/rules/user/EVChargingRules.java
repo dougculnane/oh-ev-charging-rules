@@ -15,7 +15,7 @@ import com.github.dougculnane.oh_ev_charging_rules.GoeCharger_API2;
 
 public class EVChargingRules extends JRule {
  
-	static final Duration TIME_LOCK_FOR_CHARGER = Duration.ofSeconds(60);
+	static final Duration TIME_LOCK_FOR_CHARGER = Duration.ofSeconds(91);
 	static final String CHARGER_1_LOCK_NAME = "evcr_charger_1_lock";
 	static final String CHARGER_2_LOCK_NAME = "evcr_charger_2_lock";
 	static final String RULE_NAME_EXPORT_POWER = "evcr_export_power";
@@ -45,7 +45,7 @@ public class EVChargingRules extends JRule {
 	}
 	
 	@JRuleName(CHARGER_POLLING_RULE_NAME)
-	@JRuleWhenCronTrigger(cron = "*/10 * * * * * *")
+	@JRuleWhenCronTrigger(cron = "*/30 * * * * * *")
 	public void pollChargers(JRuleTimerEvent event) {
 		logDebug(CHARGER_POLLING_RULE_NAME + " Cron Trigger.");
 		
