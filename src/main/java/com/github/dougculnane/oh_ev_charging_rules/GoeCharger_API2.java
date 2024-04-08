@@ -31,19 +31,23 @@ public class GoeCharger_API2 extends Charger {
 
 	@Override
 	boolean switchOn(double watts) {
-		int flipFlopMargin = 300;
+		int flipFlopMarginPhases = 300;
 		Double min3PhasePower = getMinimPhase3Power();
 		if (watts > min3PhasePower){
 			Integer phases = getPhases();
 			if (phases != null && phases == 3) {
 				// remove the flop margin
-				flipFlopMargin = 0;
+				flipFlopMarginPhases = flipFlopMarginPhases * -1;
 			}
 		}
-		if (watts > min3PhasePower + flipFlopMargin) {
+		int flipFlopMarginOnOff = 240;
+		if (this.isOn()) {
+			flipFlopMarginOnOff = flipFlopMarginOnOff * -1;
+		}
+		if (watts > min3PhasePower + flipFlopMarginPhases) {
 			int calcAmps = Double.valueOf(watts / 240 / 3).intValue();;
 			return switchOn(3, calcAmps);
-		} else if (watts > getMinimPhase1Power()) {
+		} else if (watts > getMinimPhase1Power() + flipFlopMarginOnOff) {
 			int calcAmps = Double.valueOf(watts / 240).intValue();
 			return switchOn(1, calcAmps);
 		} else {

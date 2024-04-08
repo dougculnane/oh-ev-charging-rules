@@ -12,13 +12,12 @@ Rules can be enabled and configured.  Individual cars can have charging target/l
 
 * openHAB runtime.
 * jRules automation addon.
-* ev charger and configured openHAB binging.
+* ev charger and configured openHAB binding.
 
 ## Recomended
 
 * EV and configured openHAB binding.
 * Items for electic price linked via energy supplier bindings or set with openHAB rules.
-
 
 ## Installation.
 
@@ -37,4 +36,12 @@ mvn clean install
 docker cp target/oh-ev-charging-rules-1.0-SNAPSHOT.jar openhab:/openhab/conf/automation/jrule/rules-jar/
 ```
 
-PRs are welcome.
+Tested implementations of Charges and PRs are welcome.
+
+## Release Notes
+
+### Version 1.0-SNAPSHOT
+
+* WIP: Real world testing and fixing for GoeCharger_API2.
+* Feature complete implementation of rules.
+* Some unit testing of rules.
