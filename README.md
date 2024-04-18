@@ -23,7 +23,7 @@ Rules can be enabled and configured.  Individual cars can have charging target/l
 
 * Add openHAB items from files in items/
 * Add openHAB widget from files in widgets/
-* Add openHAB pages from files in pages/
+* Add openHAB widget to a page
 * Link evcr items to openHAB thing channels.
 * Copy rules jar to jrules-jar folder.
 
@@ -36,12 +36,12 @@ mvn clean install
 docker cp target/oh-ev-charging-rules-1.0-SNAPSHOT.jar openhab:/openhab/conf/automation/jrule/rules-jar/
 ```
 
-Tested implementations of Charges and PRs are welcome.
+Tested implementations of Chargers and PRs are welcome.
 
 ## Release Notes
 
-### Version 1.0-SNAPSHOT
+### Version 1.0.0
 
-* WIP: Real world testing and fixing for GoeCharger_API2.
+* Real world testing and fixing for GoeCharger_API2.
 * Feature complete implementation of rules.
 * Some unit testing of rules.
