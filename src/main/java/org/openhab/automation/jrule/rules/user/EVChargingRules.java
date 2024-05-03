@@ -45,7 +45,7 @@ public class EVChargingRules extends JRule {
 	}
 	
 	@JRuleName(CHARGER_POLLING_RULE_NAME)
-	@JRuleWhenCronTrigger(cron = "*/30 * * * * * *")
+	@JRuleWhenCronTrigger(cron = "*/90 * * * * * *")
 	public void pollChargers(JRuleTimerEvent event) {
 		logDebug(CHARGER_POLLING_RULE_NAME + " Cron Trigger.");
 		
