@@ -36,7 +36,7 @@ public abstract class Charger {
 		this.number = number;
 	}
 
-	abstract boolean switchOn(double watts);
+	abstract boolean useExportPower(double watts);
 
 	abstract double getMinimPower();
 
@@ -166,7 +166,7 @@ public abstract class Charger {
 				double availablePower = wattsExported + chargingPower;
 				if (availablePower > getMinimPower()) {
 					setActiveRule(RULE_NAME.USE_EXPORT);
-					return switchOn(availablePower);
+					return useExportPower(availablePower);
 				} else {
 					setActiveRule(null);
 					return switchOff();
@@ -309,6 +309,11 @@ public abstract class Charger {
 		JRuleSwitchItem item = getRuleSwitchItem(ruleName);
 		return item != null && item.getState() != null && item.getStateAsOnOff() == JRuleOnOffValue.ON;
 	}
+	
+	boolean isExport1PhaseOnly() {
+		JRuleSwitchItem item = getExport1PhaseOnlySwitchItem();
+		return item != null && item.getState() != null && item.getStateAsOnOff() == JRuleOnOffValue.ON;
+	}
 
 	public void enableRule(String ruleName) {
 		try {
@@ -426,6 +431,10 @@ public abstract class Charger {
 		return openHabEnvironment.getSwitchItem("evcr_charger_" + number + "_switch");
 	}
 
+	protected JRuleSwitchItem getExport1PhaseOnlySwitchItem() {
+		return openHabEnvironment.getSwitchItem("evcr_charger_" + number + "_EXPORT_1phase_switch");
+	}
+	
 	protected JRuleNumberItem getAmpsItem() {
 		return openHabEnvironment.getNumberItem("evcr_charger_" + number + "_amps");
 	}

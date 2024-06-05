@@ -180,7 +180,15 @@ slots:
                           actionCommandAlt: OFF
                           actionItem: ="evcr_charger_"+props.chargerNumber+"_USE_EXPORT_switch"
                           item: ="evcr_charger_"+props.chargerNumber+"_USE_EXPORT_switch"
-                          title: Enable use export rule
+                          title: Enable use export rule                      
+                      - component: oh-label-item
+                        config:
+                          action: toggle
+                          actionCommand: ON
+                          actionCommandAlt: OFF
+                          actionItem: ="evcr_charger_"+props.chargerNumber+"_EXPORT_1phase_switch"
+                          item: ="evcr_charger_"+props.chargerNumber+"_EXPORT_1phase_switch"
+                          title: Exported power with 1 phase only                      
                       - component: oh-label-item
                         config:
                           item: evcr_export_power

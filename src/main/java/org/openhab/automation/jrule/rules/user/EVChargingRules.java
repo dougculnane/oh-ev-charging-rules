@@ -2,7 +2,6 @@ package org.openhab.automation.jrule.rules.user;
 
 import java.time.Duration;
 
-import org.openhab.automation.jrule.internal.JRuleLog;
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleName;
 import org.openhab.automation.jrule.rules.JRuleWhenCronTrigger;

@@ -40,6 +40,10 @@ Tested implementations of Chargers and PRs are welcome.
 
 ## Release Notes
 
+### Version 1.0.1
+
+* New feature use exported power with 1 phase only
+
 ### Version 1.0.0
 
 * Real world testing and fixing for GoeCharger_API2.

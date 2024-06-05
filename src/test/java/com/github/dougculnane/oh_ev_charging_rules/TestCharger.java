@@ -16,6 +16,7 @@ import org.openhab.automation.jrule.rules.user.items.MockDateTimeItem;
 import org.openhab.automation.jrule.rules.user.items.MockJRuleNumberItem;
 import org.openhab.automation.jrule.rules.user.items.MockStringItem;
 import org.openhab.automation.jrule.rules.user.items.MockSwitchItem;
+import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 
 import com.github.dougculnane.oh_ev_charging_rules.Charger.MODE_VALUE;
 import com.github.dougculnane.oh_ev_charging_rules.Charger.RULE_NAME;
@@ -337,6 +338,36 @@ class TestCharger {
 		assertEquals(RULE_NAME.TIMER, charger.getActiveRule());
 	}
 	
+	@Test
+	void test1PhaseOnlyExport() {
+		Charger charger = getTestCharger(1);
+		charger.enableRule(RULE_NAME.USE_EXPORT.toString());
+		assertFalse(charger.isExport1PhaseOnly());
+		
+		charger.getExport1PhaseOnlySwitchItem().sendCommand(JRuleOnOffValue.ON);
+		assertEquals(JRuleOnOffValue.ON, charger.getExport1PhaseOnlySwitchItem().getStateAsOnOff());
+		assertTrue(charger.isExport1PhaseOnly());
+		
+		charger.handleMode("FAST");
+		assertFastMode(charger);
+		charger.enableRule(RULE_NAME.USE_EXPORT.toString());
+		charger.handleMode("OFF");
+		charger.handleMode("RULES");
+		sendPVData(charger, 1700, true, 1, 7);
+		sendPVData(charger, 1500, true, 1, 6);
+		sendPVData(charger, 1950, true, 1, 8);
+		sendPVData(charger, 3200, true, 1 , 13);
+		sendPVData(charger, 4500, true, 1 , 16);  
+		sendPVData(charger, 4500, true, 1 , 16);
+		sendPVData(charger, 10000, true, 1 , 16);
+		sendPVData(charger, 20000, true, 1 , 16);
+		charger.handleMode("FAST");
+		assertFastMode(charger);
+		charger.handleMode("OFF");
+		assertOffMode(charger);
+
+	}
+	
 	private Charger getTestCharger(int number) {
 		final JRuleNumberItem gridPower = new MockJRuleNumberItem("evcr_export_power");
 		final JRuleNumberItem gridPowerPrice = new MockJRuleNumberItem("evcr_grid_power_price");
@@ -356,6 +387,7 @@ class TestCharger {
 		final JRuleSwitchItem rule_BEST_GRID_switch = new MockSwitchItem("evcr_charger_" + number + "_BEST_GRID_switch");	
 		final JRuleDateTimeItem evcr_charger_BEST_GRID_start = new MockDateTimeItem("evcr_charger_" + number + "_BEST_GRID_start");
 		final JRuleDateTimeItem evcr_charger_BEST_GRID_finish = new MockDateTimeItem("evcr_charger_" + number + "_BEST_GRID_finish");
+		final JRuleSwitchItem export_1phase_switch	= new MockSwitchItem("evcr_charger_" + number + "_EXPORT_1phase_switch");
 		OpenHabEnvironment mock =  Mockito.mock(OpenHabEnvironment.class);
 		Mockito.when(mock.getNumberItem(gridPower.getName())).thenReturn(gridPower);
 		Mockito.when(mock.getNumberItem(gridPowerPrice.getName())).thenReturn(gridPowerPrice);
@@ -375,6 +407,7 @@ class TestCharger {
 		Mockito.when(mock.getStringItem(evcr_charger_TIMER_finish.getName())).thenReturn(evcr_charger_TIMER_finish);
 		Mockito.when(mock.getDateTimeItem(evcr_charger_BEST_GRID_start.getName())).thenReturn(evcr_charger_BEST_GRID_start);
 		Mockito.when(mock.getDateTimeItem(evcr_charger_BEST_GRID_finish.getName())).thenReturn(evcr_charger_BEST_GRID_finish);
+		Mockito.when(mock.getSwitchItem(export_1phase_switch.getName())).thenReturn(export_1phase_switch);		
 		return new GoeCharger_API2(mock, number);
 	}
 	

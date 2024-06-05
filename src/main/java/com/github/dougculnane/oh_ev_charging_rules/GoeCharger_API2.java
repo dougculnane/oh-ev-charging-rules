@@ -30,10 +30,11 @@ public class GoeCharger_API2 extends Charger {
 	}
 
 	@Override
-	boolean switchOn(double watts) {
+	boolean useExportPower(double watts) {
 		int flipFlopMarginPhases = 300;
+		boolean allowSwitchTo3phases = !isExport1PhaseOnly();
 		Double min3PhasePower = getMinimPhase3Power();
-		if (watts > min3PhasePower){
+		if (allowSwitchTo3phases && watts > min3PhasePower){
 			Integer phases = getPhases();
 			if (phases != null && phases == 3) {
 				// remove the flop margin
@@ -44,7 +45,7 @@ public class GoeCharger_API2 extends Charger {
 		if (this.isOn()) {
 			flipFlopMarginOnOff = flipFlopMarginOnOff * -1;
 		}
-		if (watts > min3PhasePower + flipFlopMarginPhases) {
+		if (allowSwitchTo3phases && watts > min3PhasePower + flipFlopMarginPhases) {
 			int calcAmps = Double.valueOf(watts / 240 / 3).intValue();;
 			return switchOn(3, calcAmps);
 		} else if (watts > getMinimPhase1Power() + flipFlopMarginOnOff) {
@@ -92,7 +93,7 @@ public class GoeCharger_API2 extends Charger {
 	}
 
 	private boolean switchOn(int phases, int amps) {
-		return switchOn() | setPower(phases, amps);
+		return setPower(phases, amps) | switchOn();
 	}
 	
 	private boolean setPower(int phases, int amps) {
