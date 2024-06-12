@@ -42,11 +42,45 @@ public abstract class Charger {
 
 	abstract double getFastChargeRate();
 
+	/**
+	 * 
+	 * @return true if state changes
+	 */	
 	abstract boolean activateFastCharging();
 
 	/**
+	 * Is the charge ready to make a decision or change state.
+	 * @return
+	 */
+	public boolean isReady() {
+		switch (this.getMode()) {
+		case OFF: {
+			return !switchOff();
+		}
+		case FAST: {
+			return !activateFastCharging();
+		}
+		default:
+			// RULES
+			Double power = getChargingPower();
+			if (isOn()) {
+				Integer phases = getPhases();
+				Integer amps = getAmps();
+				if (power != null && phases != null && amps != null) {
+					Integer expectedPower = amps * phases * 240;					
+					// power updated and about right.
+					return Math.abs(expectedPower.intValue() - power.intValue()) < 100 * phases;
+				 }
+			} else if (isOff()) {
+				return power != null && Math.abs(power) < 50;		
+			}
+			return false;
+		}
+	}
+	
+	/**
 	 * @param modeValue
-	 * @return Create lock
+	 * @return true if state change
 	 */
 	public boolean handleMode(String modeValue) {
 		switch (modeValue) {
@@ -265,6 +299,9 @@ public abstract class Charger {
 		return 0;
 	}
 
+	/**
+	 * @return true if state changes.
+	 */
 	protected boolean switchOn() {
 		JRuleSwitchItem switchItem = getSwitchItem();
 		if (switchItem != null
@@ -275,6 +312,9 @@ public abstract class Charger {
 		return false;
 	}
 
+	/**
+	 * @return true if state changes.
+	 */
 	protected boolean switchOff() {
 		JRuleSwitchItem switchItem = getSwitchItem();
 		if (switchItem != null
@@ -285,12 +325,18 @@ public abstract class Charger {
 		return false;
 	}
 
+	/**
+	 * @return true if is On state.
+	 */
 	protected boolean isOn() {
 		JRuleSwitchItem switchItem = getSwitchItem();
 		return switchItem != null && switchItem.getState() != null
 				&& switchItem.getStateAsOnOff() == JRuleOnOffValue.ON;
 	}
 
+	/**
+	 * @return true if id Off state.
+	 */
 	protected boolean isOff() {
 		JRuleSwitchItem switchItem = getSwitchItem();
 		return switchItem == null || switchItem.getState() == null

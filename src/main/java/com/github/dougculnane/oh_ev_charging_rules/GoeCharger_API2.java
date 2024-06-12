@@ -103,8 +103,7 @@ public class GoeCharger_API2 extends Charger {
 		if (amps > MAX_AMPS) {
 			amps = MAX_AMPS;
 		}
-		setAmps(amps);
-		return setPhases(phases);
+		return setAmps(amps) | setPhases(phases);
 	}
 	
 	private Double getMinimPhase1Power() {

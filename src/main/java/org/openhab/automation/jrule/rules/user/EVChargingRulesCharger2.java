@@ -1,8 +1,10 @@
 package org.openhab.automation.jrule.rules.user;
 
+import org.openhab.automation.jrule.items.JRuleItem;
 import org.openhab.automation.jrule.rules.JRuleName;
 import org.openhab.automation.jrule.rules.JRuleWhenItemChange;
 import org.openhab.automation.jrule.rules.event.JRuleItemEvent;
+import org.openhab.automation.jrule.rules.value.JRuleValue;
 
 public class EVChargingRulesCharger2 extends EVChargingRules {
 
@@ -13,13 +15,10 @@ public class EVChargingRulesCharger2 extends EVChargingRules {
 	@JRuleName(RULE_NAME_MODE_CHANGE)
 	@JRuleWhenItemChange(item = "evcr_charger_" + CHANGER_NUMBER + "_mode")
 	public void evcr_charger_2_ModeChangeRule(JRuleItemEvent event) {
-		logDebug(RULE_NAME_MODE_CHANGE + " from: {} to: {}", event.getOldState(), event.getState());
-		if (event.getState() != null && event.getState().stringValue() != null) {
-			if (isTimeLocked(CHARGER_2_LOCK_NAME)) {
-				logDebug(CHARGER_2_LOCK_NAME + ": locked so skipping mode change");
-			} else if (charger2.handleMode(event.getState().stringValue())) {
-				getTimeLock(CHARGER_2_LOCK_NAME, TIME_LOCK_FOR_CHARGER);
-			}
+		JRuleValue state = event.getState();
+		logDebug(RULE_NAME_MODE_CHANGE + " from: {} to: {}", event.getOldState(), state);
+		if (state != null && state.stringValue() != null) {
+			charger2.handleMode(state.stringValue());
 		}
 	}
 	
@@ -30,19 +29,17 @@ public class EVChargingRulesCharger2 extends EVChargingRules {
 	@JRuleWhenItemChange(item = "evcr_charger_" + CHANGER_NUMBER + "_TARGET_switch")
 	@JRuleWhenItemChange(item = "evcr_charger_" + CHANGER_NUMBER + "_TIMER_switch")
 	public void evcr_charger_2_EnableRule(JRuleItemEvent event) {
-		logDebug(RULE_NAME_TOGGLE_RULE + " {}: {}", event.getItem().getName(), event.getState());
-		if (event.getState() != null && event.getState().stringValue() != null) {
-			String ruleName = event.getItem().getName()
+		JRuleItem item = event.getItem();
+		JRuleValue state = event.getState();
+		if (item != null && item.getName() != null && state != null) {
+			logDebug(RULE_NAME_TOGGLE_RULE + " {}: {}", item.getName(), state);
+			String ruleName = item.getName()
 					.replace("evcr_charger_" + CHANGER_NUMBER + "_", "")
 					.replace("_switch", "");
-			if (event.getState().stringValue() == "ON") {
+			if (state.stringValue() == "ON") {
 				charger2.enableRule(ruleName);
 			} else {
 				charger2.disableRule(ruleName);
-			}
-			
-			if (!isTimeLocked(CHARGER_2_LOCK_NAME) && charger2.handlePolling()) {
-				getTimeLock(CHARGER_2_LOCK_NAME, TIME_LOCK_FOR_CHARGER);
 			}
 		}
 	}
