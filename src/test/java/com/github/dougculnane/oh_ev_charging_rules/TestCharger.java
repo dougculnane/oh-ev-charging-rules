@@ -412,6 +412,12 @@ class TestCharger {
 	}
 	
 	private void sendPVData(Charger charger, double gridPower, boolean isOn, int phases, int  amps) {
+		// update charger state we are ready fast for test.
+		if (charger.isOn()) {
+			charger.getChargingPowerItem().sendCommand(charger.getAmps() * charger.getPhases() * 240);
+		} else {
+			charger.getChargingPowerItem().sendCommand(0);
+		}
 		charger.getExportPowerItem().sendCommand(gridPower - getChargingPower(charger));
 		charger.handlePolling();
 		assertEquals(isOn, charger.isOn());
@@ -422,7 +428,6 @@ class TestCharger {
 		}
 		assertEquals(phases, charger.getPhases());
 		assertEquals(amps, charger.getAmps());
-		charger.getChargingPowerItem().sendCommand(charger.getAmps() * charger.getPhases() * 240);
 	}
 	
 	private double getChargingPower(Charger charger) {

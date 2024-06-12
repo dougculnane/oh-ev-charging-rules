@@ -29,13 +29,14 @@ public class EVChargingRulesCharger1 extends EVChargingRules {
 	@JRuleWhenItemChange(item = "evcr_charger_" + CHANGER_NUMBER + "_TARGET_switch")
 	@JRuleWhenItemChange(item = "evcr_charger_" + CHANGER_NUMBER + "_TIMER_switch")
 	public void evcr_charger_1_EnableRule(JRuleItemEvent event) {
-		logDebug(RULE_NAME_TOGGLE_RULE + " {}: {}", event.getItem().getName(), event.getState());
 		JRuleItem item = event.getItem();
-		if (item != null && item.getName() != null && event.getState() != null) {				
+		JRuleValue state = event.getState();
+		if (item != null && item.getName() != null && state != null) {
+			logDebug(RULE_NAME_TOGGLE_RULE + " {}: {}", item.getName(), state);
 			String ruleName = item.getName()
 					.replace("evcr_charger_" + CHANGER_NUMBER + "_", "")
 					.replace("_switch", "");
-			if (event.getState().stringValue() == "ON") {
+			if (state.stringValue() == "ON") {
 				charger1.enableRule(ruleName);
 			} else {
 				charger1.disableRule(ruleName);

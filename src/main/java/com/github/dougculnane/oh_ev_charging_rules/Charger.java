@@ -69,6 +69,7 @@ public abstract class Charger {
 				if (power != null && phases != null && amps != null) {
 					Integer expectedPower = amps * phases * 240;					
 					// power updated and about right.
+					
 					return Math.abs(expectedPower.intValue() - power.intValue()) < 100 * phases;
 				 }
 			} else if (isOff()) {
@@ -194,16 +195,17 @@ public abstract class Charger {
 				// Then we are not in control.
 				return false;
 			}
-			
-			Double chargingPower = getChargingPower();
-			if (chargingPower != null) {
-				double availablePower = wattsExported + chargingPower;
-				if (availablePower > getMinimPower()) {
-					setActiveRule(RULE_NAME.USE_EXPORT);
-					return useExportPower(availablePower);
-				} else {
-					setActiveRule(null);
-					return switchOff();
+			if (isReady()) {
+				Double chargingPower = getChargingPower();
+				if (chargingPower != null) {
+					double availablePower = wattsExported + chargingPower;
+					if (availablePower > getMinimPower()) {
+						setActiveRule(RULE_NAME.USE_EXPORT);
+						return useExportPower(availablePower);
+					} else {
+						setActiveRule(null);
+						return switchOff();
+					}
 				}
 			}
 		}
