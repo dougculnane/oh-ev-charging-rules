@@ -68,8 +68,8 @@ public class GoeCharger_API2 extends Charger {
 		super.switchOn();
 		JRuleNumberItem item = getForceStateItem();
 		if (item != null 
-				&& (item.getState() == null	|| ((item.getStateAsDecimal().intValue() != 0 && item.getStateAsDecimal().intValue() != 2) ))) {
-			item.sendCommand(0);
+				&& (item.getState() == null	|| item.getStateAsDecimal().intValue() != 2) ) {
+			item.sendCommand(2);
 			return true;
 		}
 		return false;

@@ -1,7 +1,5 @@
 package org.openhab.automation.jrule.rules.user;
 
-import java.time.Duration;
-
 import org.openhab.automation.jrule.rules.JRule;
 import org.openhab.automation.jrule.rules.JRuleName;
 import org.openhab.automation.jrule.rules.JRuleWhenCronTrigger;
@@ -14,7 +12,6 @@ import com.github.dougculnane.oh_ev_charging_rules.GoeCharger_API2;
 
 public class EVChargingRules extends JRule {
  
-	static final Duration TIME_LOCK_FOR_CHARGER = Duration.ofSeconds(91);
 	static final String RULE_NAME_EXPORT_POWER = "evcr_export_power";
 	static final String CHARGER_POLLING_RULE_NAME = "evcr_charger_polling";
 	
@@ -27,12 +24,8 @@ public class EVChargingRules extends JRule {
 		logDebug(RULE_NAME_EXPORT_POWER + " from: {} to: {}", event.getOldState(), event.getState());		
 		if (event.getState() != null) {
 			double wattsExported = Double.valueOf(event.getState().toString());
-			boolean stateHasChanged = false;
-			if (charger1.isReady() && !stateHasChanged) {
-				stateHasChanged = charger1.handleExportPower(wattsExported);
-			}
-			if (charger2.isReady() && !stateHasChanged) {
-				stateHasChanged = charger2.handleExportPower(wattsExported);
+			if (!charger1.handleExportPower(wattsExported)) {			
+				charger2.handleExportPower(wattsExported);
 			}
 		}
 	}
@@ -45,10 +38,7 @@ public class EVChargingRules extends JRule {
 	@JRuleWhenCronTrigger(cron = "1 * * * * * *")
 	public void pollChargers(JRuleTimerEvent event) {
 		logDebug(CHARGER_POLLING_RULE_NAME + " Cron Trigger.");
-		if (charger1.isReady()) {
-			charger1.handlePolling();
-		}
-		if (charger2.isReady()) {
+		if (!charger1.handlePolling()) {
 			charger2.handlePolling();
 		}
 	}

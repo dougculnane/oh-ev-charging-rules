@@ -43,6 +43,7 @@ Tested implementations of Chargers and PRs are welcome.
 ### Version 1.1.0
 
 * Polling reduced.  Item change events used to trigger decisions.
+* evcr_action_taken_switch new switch to indicate if action was taken.
 
 ### Version 1.0.1
 

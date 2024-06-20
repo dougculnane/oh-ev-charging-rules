@@ -15,6 +15,16 @@ import org.openhab.automation.jrule.rules.value.JRuleOnOffValue;
 
 public abstract class Charger {
 
+	/**
+	 * Counter for check that the charger gets stuck in a not ready state.
+	 */
+	private static int notReadyCount = 0;
+	
+	/**
+	 * Number of time the charge is allowed to be not ready before we consider it stuck.
+	 */
+	private static final int NOT_READY_LIMIT = 10;
+	
 	final protected OpenHabEnvironment openHabEnvironment;
 
 	enum MODE_VALUE {
@@ -49,16 +59,19 @@ public abstract class Charger {
 	abstract boolean activateFastCharging();
 
 	/**
-	 * Is the charge ready to make a decision or change state.
+	 * Is the charger ready to make a decision or change state.
 	 * @return
 	 */
-	public boolean isReady() {
+	private boolean isReady() {
+		boolean ready = false;
 		switch (this.getMode()) {
 		case OFF: {
-			return !switchOff();
+			ready = !switchOff();
+			break;
 		}
 		case FAST: {
-			return !activateFastCharging();
+			ready = !activateFastCharging();
+			break;
 		}
 		default:
 			// RULES
@@ -67,16 +80,27 @@ public abstract class Charger {
 				Integer phases = getPhases();
 				Integer amps = getAmps();
 				if (power != null && phases != null && amps != null) {
-					Integer expectedPower = amps * phases * 240;					
+					if (power == 0) {
+						notReadyCount++;
+					}				
+					Integer expectedPower = amps * phases * 240;
 					// power updated and about right.
-					
-					return Math.abs(expectedPower.intValue() - power.intValue()) < 100 * phases;
+					ready = Math.abs(expectedPower.intValue() - power.intValue()) < (220 * phases);
 				 }
 			} else if (isOff()) {
-				return power != null && Math.abs(power) < 50;		
+				ready = power != null && Math.abs(power) < 50;		
 			}
-			return false;
+			break;
 		}
+		if (ready) {
+			notReadyCount = 0;
+		} else if (notReadyCount >= NOT_READY_LIMIT) {
+			notReadyCount = 0;
+			ready = true;			
+		} else {
+			notReadyCount++;
+		}
+		return ready;
 	}
 	
 	/**
@@ -156,9 +180,9 @@ public abstract class Charger {
 		}
 
 		// TARGET
-		if (!fastChargingActivated && car != null 
-				&& isRuleEnabled(RULE_NAME.TARGET) 
+		if (!fastChargingActivated 
 				&& car != null 
+				&& isRuleEnabled(RULE_NAME.TARGET) 
 				&& car.getTargetTime() != null) {
 			int bufferMins = 30;
 			int neededMins = car.getMinutesNeededForTarget(getFastChargeRate());
