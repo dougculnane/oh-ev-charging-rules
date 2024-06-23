@@ -9,7 +9,7 @@ props:
       required: true
       type: TEXT
   parameterGroups: []
-timestamp: Mar 26, 2024, 2:55:41 PM
+timestamp: Jun 23, 2024, 8:00:50 AM
 component: f7-card
 config: {}
 slots:
@@ -34,6 +34,16 @@ slots:
                           color: gray
                         slots:
                           default:
+                            - component: oh-button
+                              config:
+                                action: command
+                                actionCommand: DISABLE
+                                actionItem: ="evcr_charger_"+props.chargerNumber+"_mode"
+                                active: =((items["evcr_charger_"+props.chargerNumber+"_mode"]).state === 'DISABLE')
+                                iconF7: xmark_rectangle
+                                outline: true
+                                round: true
+                                text: Disable
                             - component: oh-button
                               config:
                                 action: command
@@ -180,7 +190,7 @@ slots:
                           actionCommandAlt: OFF
                           actionItem: ="evcr_charger_"+props.chargerNumber+"_USE_EXPORT_switch"
                           item: ="evcr_charger_"+props.chargerNumber+"_USE_EXPORT_switch"
-                          title: Enable use export rule                      
+                          title: Enable use export rule
                       - component: oh-label-item
                         config:
                           action: toggle
@@ -188,7 +198,7 @@ slots:
                           actionCommandAlt: OFF
                           actionItem: ="evcr_charger_"+props.chargerNumber+"_EXPORT_1phase_switch"
                           item: ="evcr_charger_"+props.chargerNumber+"_EXPORT_1phase_switch"
-                          title: Exported power with 1 phase only                      
+                          title: Exported power with 1 phase only
                       - component: oh-label-item
                         config:
                           item: evcr_export_power
@@ -295,4 +305,3 @@ slots:
                           sendButton: true
                           title: Target Time (HH:mm)
                           type: text
-
