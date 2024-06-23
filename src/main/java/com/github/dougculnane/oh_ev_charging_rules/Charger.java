@@ -23,12 +23,12 @@ public abstract class Charger {
 	/**
 	 * Number of time the charge is allowed to be not ready before we consider it stuck.
 	 */
-	private static final int NOT_READY_LIMIT = 10;
+	private static final int NOT_READY_LIMIT = 5;
 	
 	final protected OpenHabEnvironment openHabEnvironment;
 
 	enum MODE_VALUE {
-		OFF, FAST, RULES
+		DISABLE, OFF, FAST, RULES
 	}
 
 	enum RULE_NAME {
@@ -80,12 +80,9 @@ public abstract class Charger {
 				Integer phases = getPhases();
 				Integer amps = getAmps();
 				if (power != null && phases != null && amps != null) {
-					if (power == 0) {
-						notReadyCount++;
-					}				
 					Integer expectedPower = amps * phases * 240;
-					// power updated and about right.
-					ready = Math.abs(expectedPower.intValue() - power.intValue()) < (220 * phases);
+					// power about right.
+					ready = Math.abs(expectedPower.intValue() - power.intValue()) < (500 * phases);
 				 }
 			} else if (isOff()) {
 				ready = power != null && Math.abs(power) < 50;		
@@ -109,6 +106,10 @@ public abstract class Charger {
 	 */
 	public boolean handleMode(String modeValue) {
 		switch (modeValue) {
+		case "DISABLE": {
+			setMode(MODE_VALUE.DISABLE);
+			return false;
+		}
 		case "OFF": {
 			setMode(MODE_VALUE.OFF);
 			return switchOff();

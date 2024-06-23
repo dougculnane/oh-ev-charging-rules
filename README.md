@@ -40,6 +40,11 @@ Tested implementations of Chargers and PRs are welcome.
 
 ## Release Notes
 
+### Version 1.1.1
+
+* Increase power ready margin.
+* Disable Mode to stop all logic and allow manual external control.
+
 ### Version 1.1.0
 
 * Polling re-factored to use item change events used to trigger decisions.
