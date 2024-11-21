@@ -30,7 +30,7 @@ public class GoeCharger_API2 extends Charger {
 	}
 
 	@Override
-	boolean useExportPower(double watts) {
+	boolean useExportPower(final double watts) {
 		int flipFlopMarginPhases = 300;
 		boolean allowSwitchTo3phases = !isExport1PhaseOnly();
 		Double min3PhasePower = getMinimPhase3Power();

@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.openhab.automation.jrule.rules.user</groupId>
   <artifactId>oh-ev-charging-rules</artifactId>
-  <version>1.1.1</version>
+  <version>1.1.2</version>
   <name>oh-ev-charging-rules</name>
   <properties>
     <java.version>17</java.version>
@@ -16,9 +16,9 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>com.github.seaside1</groupId>
+      <groupId>org.openhab.automation</groupId>
       <artifactId>jrule</artifactId>
-      <version>main-SNAPSHOT</version>
+      <version>4.0.0-BETA21</version>
     </dependency>
     <dependency>
       <version>1.2.9</version>

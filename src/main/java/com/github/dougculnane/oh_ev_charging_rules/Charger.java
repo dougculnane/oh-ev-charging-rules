@@ -32,7 +32,7 @@ public abstract class Charger {
 	}
 
 	enum RULE_NAME {
-		CHEAP, BEST_GRID, USE_EXPORT, TARGET, TIMER
+		CHEAP, BEST_GRID, USE_EXPORT, TARGET, TIMER, MAX
 	}
 
 	int number;
@@ -82,7 +82,7 @@ public abstract class Charger {
 				if (power != null && phases != null && amps != null) {
 					Integer expectedPower = amps * phases * 240;
 					// power about right.
-					ready = Math.abs(expectedPower.intValue() - power.intValue()) < (500 * phases);
+					ready = Math.abs(expectedPower.intValue() - power.intValue()) < (650 * phases);
 				 }
 			} else if (isOff()) {
 				ready = power != null && Math.abs(power) < 50;		
@@ -133,9 +133,11 @@ public abstract class Charger {
 		}
 		final Car car = getConnectedCar();
 		if (car != null) {
-			if (car.targetLevelReached()) {
-				setActiveRule(RULE_NAME.TARGET);
+			if (car.maxLevelReached()) {
+				setActiveRule(RULE_NAME.MAX);
 				return switchOff();
+			} else if (getActiveRule() == RULE_NAME.MAX) {
+				setActiveRule(null);
 			}
 		}
 

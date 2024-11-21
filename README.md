@@ -32,6 +32,7 @@ Rules can be enabled and configured.  Individual cars can have charging target/l
 Clone build and deploy this project. A docker testing runtime is detailed in src/test/docker
 
 ```bash
+mvn install:install-file -Dfile=lib/org.openhab.automation.jrule-4.0.0-BETA21.jar -DgroupId=org.openhab.automation -DartifactId=jrule -Dversion=4.0.0-BETA21 -Dpackaging=jar
 mvn clean install
 docker cp target/oh-ev-charging-rules-1.0-SNAPSHOT.jar openhab:/openhab/conf/automation/jrule/rules-jar/
 ```
@@ -39,6 +40,10 @@ docker cp target/oh-ev-charging-rules-1.0-SNAPSHOT.jar openhab:/openhab/conf/aut
 Tested implementations of Chargers and PRs are welcome.
 
 ## Release Notes
+
+### Version 1.1.2
+
+* Max Battery rule and items to separate form target
 
 ### Version 1.1.1
 

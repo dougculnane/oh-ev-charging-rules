@@ -224,6 +224,10 @@ slots:
                           actionItem: ="evcr_charger_"+props.chargerNumber+"_TARGET_switch"
                           item: ="evcr_charger_"+props.chargerNumber+"_TARGET_switch"
                           title: Enable target rule
+          - component: oh-list-item
+            config:
+              icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) == "MAX")?"f7:arrow_right_circle_fill":"f7:checkmark_alt_circle"
+              title: ="Max rule (" +  (items["evcr_car_"+ (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) +"_max_level"]).state  + "%)"            
           - component: f7-row
             config:
               style:
@@ -287,6 +291,17 @@ slots:
                           sendButton: true
                           title: Car name
                           type: text
+                      - component: oh-slider-item
+                        config:
+                          defaultValue: "100"
+                          icon: oh:batterylevel
+                          iconUseState: true
+                          ignoreDisplayState: true
+                          item: ="evcr_car_" +  (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) + "_max_level"
+                          label: true
+                          releaseOnly: true
+                          scale: true
+                          title: Max battery level                          
                       - component: oh-slider-item
                         config:
                           defaultValue: "100"

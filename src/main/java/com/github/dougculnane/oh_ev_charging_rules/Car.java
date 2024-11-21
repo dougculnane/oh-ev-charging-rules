@@ -38,6 +38,10 @@ public class Car {
 		return getBatteryLevel() >= getTargetLevel();
 	}
 	
+	public boolean maxLevelReached() {
+		return getBatteryLevel() >= getMaxLevel();
+	}	
+	
 	private int getBatterySize() {
 		JRuleNumberItem item = getBatterySizelItem();
 		if (item != null && item.getState() != null) {
@@ -54,6 +58,13 @@ public class Car {
 		return 0;
 	}
 	
+	private int getMaxLevel() {
+		JRuleNumberItem item = getMaxLevelItem();
+		if (item != null && item.getState() != null) {
+			return item.getStateAsDecimal().intValue();
+		}
+		return 100;		
+	}
 	
 	private int getTargetLevel() {
 		JRuleNumberItem item = getTargetLevelItem();
@@ -91,6 +102,9 @@ public class Car {
 	}
 	protected JRuleNumberItem getTargetLevelItem() {
 		return openHabEnvironment.getNumberItem("evcr_car_" + number + "_target_level");
+	}
+	protected JRuleNumberItem getMaxLevelItem() {
+		return openHabEnvironment.getNumberItem("evcr_car_" + number + "_max_level");
 	}
 	protected JRuleStringItem getTargetTimeItem() {
 		return openHabEnvironment.getStringItem("evcr_car_" + number + "_target_time");
