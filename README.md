@@ -41,6 +41,10 @@ Tested implementations of Chargers and PRs are welcome.
 
 ## Release Notes
 
+### Version 1.1.3
+
+* Fix target level overrun.
+
 ### Version 1.1.2
 
 * Max Battery rule and items to separate form target

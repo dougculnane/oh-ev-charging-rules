@@ -192,7 +192,8 @@ public abstract class Charger {
 			Calendar cal = car.getTargetTime();
 			cal.add(Calendar.MINUTE, (neededMins * -1) - bufferMins);
 			if (neededMins > (0 - bufferMins)
-					&& cal.before(Calendar.getInstance())) {
+					&& cal.before(Calendar.getInstance())
+					&& car.getBatteryLevel() < car.getTargetLevel()) {
 				setActiveRule(RULE_NAME.TARGET);
 				fastChargingActivated = true;
 			} else if (getActiveRule() == RULE_NAME.TARGET) {
