@@ -50,7 +50,7 @@ public class Car {
 		return 50;
 	}
 	
-	public int getBatteryLevel() {
+	private int getBatteryLevel() {
 		JRuleNumberItem item = getBatteryLevelItem();
 		if (item != null && item.getState() != null) {
 			return item.getStateAsDecimal().intValue();
@@ -58,7 +58,7 @@ public class Car {
 		return 0;
 	}
 	
-	public int getMaxLevel() {
+	private int getMaxLevel() {
 		JRuleNumberItem item = getMaxLevelItem();
 		if (item != null && item.getState() != null) {
 			return item.getStateAsDecimal().intValue();
@@ -66,7 +66,7 @@ public class Car {
 		return 100;		
 	}
 	
-	public int getTargetLevel() {
+	private int getTargetLevel() {
 		JRuleNumberItem item = getTargetLevelItem();
 		if (item != null && item.getState() != null) {
 			return item.getStateAsDecimal().intValue();
