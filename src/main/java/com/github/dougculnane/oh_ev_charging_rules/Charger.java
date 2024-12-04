@@ -186,7 +186,8 @@ public abstract class Charger {
 		if (!fastChargingActivated 
 				&& car != null 
 				&& isRuleEnabled(RULE_NAME.TARGET) 
-				&& car.getTargetTime() != null) {
+				&& car.getTargetTime() != null
+				&& !car.targetLevelReached()) {
 			int bufferMins = 30;
 			int neededMins = car.getMinutesNeededForTarget(getFastChargeRate());
 			Calendar cal = car.getTargetTime();
@@ -194,14 +195,11 @@ public abstract class Charger {
 			if (neededMins > (0 - bufferMins)
 					&& cal.before(Calendar.getInstance())) {
 				setActiveRule(RULE_NAME.TARGET);
-				if (!car.targetLevelReached()) {
-					fastChargingActivated = true;
-				}
+				fastChargingActivated = true;				
 			} else if (getActiveRule() == RULE_NAME.TARGET) {
 				setActiveRule(null);
 			}
-		} else if (getActiveRule() == RULE_NAME.TARGET 
-				&& (car == null || !car.targetLevelReached())) {
+		} else if (getActiveRule() == RULE_NAME.TARGET) {
 			setActiveRule(null);
 		}
 
