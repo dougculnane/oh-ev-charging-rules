@@ -9,7 +9,7 @@ props:
       required: true
       type: TEXT
   parameterGroups: []
-timestamp: Jun 23, 2024, 8:00:50 AM
+timestamp: Feb 9, 2026, 10:41:09 AM
 component: f7-card
 config: {}
 slots:
@@ -17,7 +17,9 @@ slots:
     - component: oh-list-card
       config:
         accordionList: true
-        title: = ((items["evcr_charger_"+props.chargerNumber+"_name"]).state) === "NULL" ? "Charger " + props.chargerNumber:((items["evcr_charger_"+props.chargerNumber+"_name"]).state)
+        title: = ((items["evcr_charger_"+props.chargerNumber+"_name"]).state) === "NULL"
+          ? "Charger " +
+          props.chargerNumber:((items["evcr_charger_"+props.chargerNumber+"_name"]).state)
       slots:
         default:
           - component: f7-row
@@ -39,7 +41,8 @@ slots:
                                 action: command
                                 actionCommand: DISABLE
                                 actionItem: ="evcr_charger_"+props.chargerNumber+"_mode"
-                                active: =((items["evcr_charger_"+props.chargerNumber+"_mode"]).state === 'DISABLE')
+                                active: =((items["evcr_charger_"+props.chargerNumber+"_mode"]).state ===
+                                  'DISABLE')
                                 iconF7: xmark_rectangle
                                 outline: true
                                 round: true
@@ -59,7 +62,8 @@ slots:
                                 action: command
                                 actionCommand: RULES
                                 actionItem: ="evcr_charger_"+props.chargerNumber+"_mode"
-                                active: =((items["evcr_charger_"+props.chargerNumber+"_mode"]).state === 'RULES')
+                                active: =((items["evcr_charger_"+props.chargerNumber+"_mode"]).state ===
+                                  'RULES')
                                 iconF7: list_dash
                                 outline: true
                                 round: true
@@ -76,8 +80,16 @@ slots:
                                 text: Fast
           - component: oh-list-item
             config:
-              icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) == "TIMER")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_TIMER_switch"].state) == "ON")?"f7:checkmark_alt_circle":"f7:circle"
-              title: ="Timer rule"+(((items["evcr_charger_"+props.chargerNumber+"_TIMER_switch"].state) == "ON")? " (" + (items["evcr_charger_"+props.chargerNumber+"_TIMER_start"].state) + " to " + (items["evcr_charger_"+props.chargerNumber+"_TIMER_finish"].state) + ")":"")
+              icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) ==
+                "TIMER")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_TIMER_switch"].state)
+                == "ON")?"f7:checkmark_alt_circle":"f7:circle"
+              title: ="Timer
+                rule"+(((items["evcr_charger_"+props.chargerNumber+"_TIMER_switch"].state)
+                == "ON")? " (" +
+                (items["evcr_charger_"+props.chargerNumber+"_TIMER_start"].state)
+                + " to " +
+                (items["evcr_charger_"+props.chargerNumber+"_TIMER_finish"].state)
+                + ")":"")
             slots:
               accordion:
                 - component: oh-list-card
@@ -111,8 +123,13 @@ slots:
                           type: text
           - component: oh-list-item
             config:
-              icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) == "CHEAP")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_CHEAP_switch"].state) == "ON")?"f7:checkmark_alt_circle":"f7:circle"
-              title: ="Cheap power rule"+(((items["evcr_charger_"+props.chargerNumber+"_CHEAP_switch"].state) == "ON")? " (" + (items["evcr_cheap_power_price"].state) + " > " + (items["evcr_grid_power_price"].state) + " ? )":"")
+              icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) ==
+                "CHEAP")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_CHEAP_switch"].state)
+                == "ON")?"f7:checkmark_alt_circle":"f7:circle"
+              title: ="Cheap power
+                rule"+(((items["evcr_charger_"+props.chargerNumber+"_CHEAP_switch"].state)
+                == "ON")? " (" + (items["evcr_cheap_power_price"].state) + " > "
+                + (items["evcr_grid_power_price"].state) + " ? )":"")
             slots:
               accordion:
                 - component: oh-list-card
@@ -143,8 +160,16 @@ slots:
                           type: text
           - component: oh-list-item
             config:
-              icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) == "BEST_GRID")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_BEST_GRID_switch"].state) == "ON")?"f7:checkmark_alt_circle":"f7:circle"
-              title: ="Best grid rule"+(((items["evcr_charger_"+props.chargerNumber+"_BEST_GRID_switch"].state) == "ON")? " (" + (items["evcr_charger_"+props.chargerNumber+"_BEST_GRID_start"].displayState) + " - "+ (items["evcr_charger_"+props.chargerNumber+"_BEST_GRID_finish"].displayState) +")":"")
+              icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) ==
+                "BEST_GRID")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_BEST_GRID_switch"].state)
+                == "ON")?"f7:checkmark_alt_circle":"f7:circle"
+              title: ="Best grid
+                rule"+(((items["evcr_charger_"+props.chargerNumber+"_BEST_GRID_switch"].state)
+                == "ON")? " (" +
+                (items["evcr_charger_"+props.chargerNumber+"_BEST_GRID_start"].displayState)
+                + " - "+
+                (items["evcr_charger_"+props.chargerNumber+"_BEST_GRID_finish"].displayState)
+                +")":"")
             slots:
               accordion:
                 - component: oh-list-card
@@ -172,8 +197,12 @@ slots:
                           title: Best grid finish
           - component: oh-list-item
             config:
-              icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) == "USE_EXPORT")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_USE_EXPORT_switch"].state) == "ON")?"f7:checkmark_alt_circle":"f7:circle"
-              title: ="Use export rule"+(((items["evcr_charger_"+props.chargerNumber+"_USE_EXPORT_switch"].state) == "ON")? " (" + (items.evcr_export_power.state) + " W)":"")
+              icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) ==
+                "USE_EXPORT")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_USE_EXPORT_switch"].state)
+                == "ON")?"f7:checkmark_alt_circle":"f7:circle"
+              title: ="Use export
+                rule"+(((items["evcr_charger_"+props.chargerNumber+"_USE_EXPORT_switch"].state)
+                == "ON")? " (" + (items.evcr_export_power.state) + " W)":"")
             slots:
               accordion:
                 - component: oh-list-card
@@ -205,8 +234,17 @@ slots:
                           title: Exported power
           - component: oh-list-item
             config:
-              icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) == "TARGET")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_TARGET_switch"].state) == "ON")?"f7:checkmark_alt_circle":"f7:circle"
-              title: ="Target rule (" +  (items["evcr_car_"+ (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) +"_target_level"]).state  + "%"+(((items["evcr_charger_"+props.chargerNumber+"_TARGET_switch"].state) == "ON")? " @ " + (items["evcr_car_"+ (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) +"_target_time"]).state:"")+ ")"
+              icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) ==
+                "TARGET")?"f7:arrow_right_circle_fill":((items["evcr_charger_"+props.chargerNumber+"_TARGET_switch"].state)
+                == "ON")?"f7:checkmark_alt_circle":"f7:circle"
+              title: ="Target rule (" +  (items["evcr_car_"+
+                (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state)
+                +"_target_level"]).state  +
+                "%"+(((items["evcr_charger_"+props.chargerNumber+"_TARGET_switch"].state)
+                == "ON")? " @ " + (items["evcr_car_"+
+                (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state)
+                +"_target_time"]).state:"")+ ")"
+              visible: =(items["evcr_charger_"+props.chargerNumber+"_connected_car"].state !== '-')
             slots:
               accordion:
                 - component: oh-list-card
@@ -226,8 +264,12 @@ slots:
                           title: Enable target rule
           - component: oh-list-item
             config:
-              icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) == "MAX")?"f7:arrow_right_circle_fill":"f7:checkmark_alt_circle"
-              title: ="Max rule (" +  (items["evcr_car_"+ (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) +"_max_level"]).state  + "%)"            
+              icon: =((items["evcr_charger_"+props.chargerNumber+"_active_rule"].state) ==
+                "MAX")?"f7:arrow_right_circle_fill":"f7:checkmark_alt_circle"
+              title: ="Max rule (" +  (items["evcr_car_"+
+                (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state)
+                +"_max_level"]).state  + "%)"
+              visible: =(items["evcr_charger_"+props.chargerNumber+"_connected_car"].state !== '-')
           - component: f7-row
             config:
               style:
@@ -260,13 +302,23 @@ slots:
                               config:
                                 outline: true
                                 round: true
-                                text: =(items["evcr_charger_"+props.chargerNumber+"_phases"]).state+" ∿ "+(items["evcr_charger_"+props.chargerNumber+"_amps"]).state
+                                text: =(items["evcr_charger_"+props.chargerNumber+"_phases"]).state+" ∿
+                                  "+(items["evcr_charger_"+props.chargerNumber+"_amps"]).state
           - component: oh-list-item
             config:
               icon: oh:batterylevel
               iconUseState: true
-              item: ="evcr_car_"+  (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) +"_battery_level"
-              title: =((items["evcr_car_"+ (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) +"_name"]).state === "NULL"?"Car "+(items["evcr_charger_"+props.chargerNumber+"_connected_car"].state):(items["evcr_car_"+ (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) +"_name"]).state )+ " - " +  (items["evcr_car_"+ (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) +"_battery_level"]).state  + "%"
+              item: ="evcr_car_"+  (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state)
+                +"_battery_level"
+              title: =((items["evcr_car_"+
+                (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state)
+                +"_name"]).state === "NULL"?"Car
+                "+(items["evcr_charger_"+props.chargerNumber+"_connected_car"].state):(items["evcr_car_"+
+                (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state)
+                +"_name"]).state )+ " - " +  (items["evcr_car_"+
+                (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state)
+                +"_battery_level"]).state  + "%"
+              visible: =(items["evcr_charger_"+props.chargerNumber+"_connected_car"].state !== '-')
             slots:
               accordion:
                 - component: oh-list-card
@@ -287,7 +339,9 @@ slots:
                       - component: oh-input-item
                         config:
                           inputmode: text
-                          item: ="evcr_car_"+ (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) +"_name"
+                          item: ="evcr_car_"+
+                            (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state)
+                            +"_name"
                           sendButton: true
                           title: Car name
                           type: text
@@ -297,18 +351,22 @@ slots:
                           icon: oh:batterylevel
                           iconUseState: true
                           ignoreDisplayState: true
-                          item: ="evcr_car_" +  (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) + "_max_level"
+                          item: ="evcr_car_"
+                            +  (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state)
+                            + "_max_level"
                           label: true
                           releaseOnly: true
                           scale: true
-                          title: Max battery level                          
+                          title: Max battery level
                       - component: oh-slider-item
                         config:
                           defaultValue: "100"
                           icon: oh:batterylevel
                           iconUseState: true
                           ignoreDisplayState: true
-                          item: ="evcr_car_" +  (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) + "_target_level"
+                          item: ="evcr_car_"
+                            +  (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state)
+                            + "_target_level"
                           label: true
                           releaseOnly: true
                           scale: true
@@ -316,7 +374,9 @@ slots:
                       - component: oh-input-item
                         config:
                           inputmode: text
-                          item: ="evcr_car_" + (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state) +"_target_time"
+                          item: ="evcr_car_" +
+                            (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state)
+                            +"_target_time"
                           sendButton: true
                           title: Target Time (HH:mm)
                           type: text
