@@ -41,6 +41,11 @@ Tested implementations of Chargers and PRs are welcome.
 
 ## Release Notes
 
+### Version 1.1.4
+
+ * One phase limit switch on timer rule.  
+ * New items: evcr_charger_1_TIMER_1phase_switch, evcr_charger_2_TIMER_1phase_switch
+
 ### Version 1.1.3
 
 * Fix target level overrun.

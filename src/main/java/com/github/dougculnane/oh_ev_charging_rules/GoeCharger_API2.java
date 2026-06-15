@@ -3,6 +3,8 @@ package com.github.dougculnane.oh_ev_charging_rules;
 import org.openhab.automation.jrule.items.JRuleNumberItem;
 import org.openhab.automation.jrule.rules.user.OpenHabEnvironment;
 
+import com.github.dougculnane.oh_ev_charging_rules.Charger.RULE_NAME;
+
 /**
  * Uses the Go-eCharger Binding: https://www.openhab.org/addons/bindings/goecharger/ 
  * API version 2
@@ -21,7 +23,11 @@ public class GoeCharger_API2 extends Charger {
 
 	@Override
 	protected boolean activateFastCharging() {
-		return switchOn(3, MAX_AMPS);
+	    int phases = 3;
+	    if (getActiveRule() == RULE_NAME.TIMER && isTimer1PhaseOnly()) {
+	        phases = 1;
+	    }
+		return switchOn(phases, MAX_AMPS);
 	}
 
 	@Override

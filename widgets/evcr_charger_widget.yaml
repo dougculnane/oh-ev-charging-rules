@@ -9,7 +9,7 @@ props:
       required: true
       type: TEXT
   parameterGroups: []
-timestamp: Feb 9, 2026, 10:41:09 AM
+timestamp: Feb 9, 2026, 10:48:05 AM
 component: f7-card
 config: {}
 slots:
@@ -107,6 +107,14 @@ slots:
                           actionItem: ="evcr_charger_"+props.chargerNumber+"_TIMER_switch"
                           item: ="evcr_charger_"+props.chargerNumber+"_TIMER_switch"
                           title: Enable TIMER rule
+                      - component: oh-label-item
+                        config:
+                          action: toggle
+                          actionCommand: ON
+                          actionCommandAlt: OFF
+                          actionItem: ="evcr_charger_"+props.chargerNumber+"_TIMER_1phase_switch"
+                          item: ="evcr_charger_"+props.chargerNumber+"_TIMER_1phase_switch"
+                          title: Timer power with 1 phase only                      
                       - component: oh-input-item
                         config:
                           inputmode: text
@@ -244,7 +252,8 @@ slots:
                 == "ON")? " @ " + (items["evcr_car_"+
                 (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state)
                 +"_target_time"]).state:"")+ ")"
-              visible: =(items["evcr_charger_"+props.chargerNumber+"_connected_car"].state !== '-')
+              visible: =(items["evcr_charger_"+props.chargerNumber+"_connected_car"].state !==
+                '-')
             slots:
               accordion:
                 - component: oh-list-card
@@ -269,7 +278,8 @@ slots:
               title: ="Max rule (" +  (items["evcr_car_"+
                 (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state)
                 +"_max_level"]).state  + "%)"
-              visible: =(items["evcr_charger_"+props.chargerNumber+"_connected_car"].state !== '-')
+              visible: =(items["evcr_charger_"+props.chargerNumber+"_connected_car"].state !==
+                '-')
           - component: f7-row
             config:
               style:
@@ -318,7 +328,8 @@ slots:
                 +"_name"]).state )+ " - " +  (items["evcr_car_"+
                 (items["evcr_charger_"+props.chargerNumber+"_connected_car"].state)
                 +"_battery_level"]).state  + "%"
-              visible: =(items["evcr_charger_"+props.chargerNumber+"_connected_car"].state !== '-')
+              visible: =(items["evcr_charger_"+props.chargerNumber+"_connected_car"].state !==
+                '-')
             slots:
               accordion:
                 - component: oh-list-card

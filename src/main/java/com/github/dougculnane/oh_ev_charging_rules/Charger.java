@@ -150,7 +150,7 @@ public abstract class Charger {
 			Date timerFinish = getTimerFinish();
 			if (timerStart != null && timerFinish != null && now.after(timerStart) && now.before(timerFinish)) {
 				setActiveRule(RULE_NAME.TIMER);
-				fastChargingActivated = true;
+			    fastChargingActivated = true;
 			} else if (getActiveRule() == RULE_NAME.TIMER) {
 				setActiveRule(null);
 			}
@@ -389,6 +389,11 @@ public abstract class Charger {
 		JRuleSwitchItem item = getExport1PhaseOnlySwitchItem();
 		return item != null && item.getState() != null && item.getStateAsOnOff() == JRuleOnOffValue.ON;
 	}
+	
+    boolean isTimer1PhaseOnly() {
+        JRuleSwitchItem item = getTimer1PhaseOnlySwitchItem();
+        return item != null && item.getState() != null && item.getStateAsOnOff() == JRuleOnOffValue.ON;
+    }
 
 	public void enableRule(String ruleName) {
 		try {
@@ -509,6 +514,10 @@ public abstract class Charger {
 	protected JRuleSwitchItem getExport1PhaseOnlySwitchItem() {
 		return openHabEnvironment.getSwitchItem("evcr_charger_" + number + "_EXPORT_1phase_switch");
 	}
+	
+    protected JRuleSwitchItem getTimer1PhaseOnlySwitchItem() {
+        return openHabEnvironment.getSwitchItem("evcr_charger_" + number + "_TIMER_1phase_switch");
+    }
 	
 	protected JRuleNumberItem getAmpsItem() {
 		return openHabEnvironment.getNumberItem("evcr_charger_" + number + "_amps");
