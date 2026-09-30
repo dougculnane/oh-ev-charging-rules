@@ -52,10 +52,10 @@ public class GoeCharger_API2 extends Charger {
 			flipFlopMarginOnOff = flipFlopMarginOnOff * -1;
 		}
 		if (allowSwitchTo3phases && watts > min3PhasePower + flipFlopMarginPhases) {
-			int calcAmps = Double.valueOf(watts / 240 / 3).intValue();;
+			int calcAmps = Double.valueOf((watts + 360) / 240 / 3).intValue();;
 			return switchOn(3, calcAmps);
 		} else if (watts > getMinimPhase1Power() + flipFlopMarginOnOff) {
-			int calcAmps = Double.valueOf(watts / 240).intValue();
+			int calcAmps = Double.valueOf((watts + 120) / 240).intValue();
 			return switchOn(1, calcAmps);
 		} else {
 			return switchOff();

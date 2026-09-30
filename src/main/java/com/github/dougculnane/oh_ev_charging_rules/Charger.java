@@ -45,7 +45,7 @@ public abstract class Charger {
 		this.openHabEnvironment = openHabEnvironment;
 		this.number = number;
 	}
-
+	
 	abstract boolean useExportPower(double watts);
 
 	abstract double getMinimPower();
@@ -202,7 +202,7 @@ public abstract class Charger {
 		} else if (getActiveRule() == RULE_NAME.TARGET) {
 			setActiveRule(null);
 		}
-
+		
 		// USE Export or switch off
 		if (fastChargingActivated) {
 			return activateFastCharging();
