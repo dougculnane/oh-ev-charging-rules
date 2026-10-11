@@ -24,7 +24,7 @@ public class GoeCharger_API2 extends Charger {
 	@Override
 	protected boolean activateFastCharging() {
 	    int phases = 3;
-	    if (getActiveRule() == RULE_NAME.TIMER && isTimer1PhaseOnly()) {
+	    if (RULE_NAME.TIMER.equals(getActiveRule()) && isTimer1PhaseOnly()) {
 	        phases = 1;
 	    }
 		return switchOn(phases, MAX_AMPS);
